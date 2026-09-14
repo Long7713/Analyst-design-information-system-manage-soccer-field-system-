@@ -119,8 +119,6 @@ Dưới đây là sơ đồ cấu trúc các lớp đã được mô phỏng l�
 - Nghiệp vụ có chứa các giao dịch tài chính (cọc, hoàn cọc) nên rất cần đảm bảo tính toàn vẹn dữ liệu (**ACID**).
 - Các thực thể (bảng) có mối quan hệ chặt chẽ với nhau (Ví dụ: 1 booking có thể có nhiều payment, nhiều refund log).
 
-Lý do dùng database quan hệ: nghiệp vụ có giao dịch tài chính (cọc, hoàn cọc) cần tính toàn vẹn dữ liệu (ACID) và các bảng có quan hệ chặt với nhau (1 booking có nhiều payment, nhiều refund log).
-
 ### 6. Phân chia công việc (5 người)
 
         Vai trò Người phụ trách Đầu ra chính
