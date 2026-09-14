@@ -77,27 +77,47 @@ Sau mỗi ca/ngày, hệ thống tổng hợp: số booking hoàn tất, số no
 
 Chọn kiến trúc Monolithic (một backend duy nhất, một lần deploy) vì team 5 người, giai đoạn MVP, chưa có nhu cầu scale từng phần riêng biệt. Bên trong monolith, code được tổ chức theo lớp để tránh rối khi hệ thống lớn dần:
 
-┌─────────────────────────────────────────────┐
-│ CLIENT LAYER │
-│ Web Booking (khách) │ Admin Dashboard (QL)│
-└─────────────────────┬─────────────────────────┘
-│ REST API (HTTPS)
-|
-┌─────────────────────▼─────────────────────────┐
-│ APPLICATION LAYER (Backend) │
-│ Booking Service │ Payment Service │
-│ (state machine) │ (cọc, hoàn cọc theo bậc) │
-│ Scheduler/Worker │ Notification Service │
-│ (grace period, │ (Zalo / SMS / call) │
-│ auto-cancel) │ │
-└─────────────────────┬─────────────────────────┘
-│
-|
-┌─────────────────────▼─────────────────────────┐
-│ DATA LAYER — Relational DB (PostgreSQL) │
-│ Customer, Court, Booking, Payment, RefundLog │
+# Cấu trúc Kiến trúc Hệ thống (Monolithic)
 
-└─────────────────────────────────────────────────┘
+## 1. Quyết định Kiến trúc
+Chọn kiến trúc **Monolithic** (một backend duy nhất, một lần deploy).
+- **Lý do:** Team 5 người, đang ở giai đoạn MVP (Minimum Viable Product), chưa có nhu cầu scale từng phần riêng biệt.
+- **Tổ chức code:** Bên trong monolith, code được tổ chức theo lớp (layer) để tránh rối khi hệ thống lớn dần.
+
+## 2. Mô hình các Lớp (Layers)
+
+Dưới đây là sơ đồ cấu trúc các lớp đã được mô phỏng lại một cách trực quan, sửa lỗi ngắt dòng so với bản gốc:
+
+```text
+[CLIENT LAYER] 
+      ├── Web Booking (dành cho Khách) 
+      └── Admin Dashboard (dành cho Quản lý)
+               |
+      [REST API (HTTPS)]
+               |
+               ▼
+[APPLICATION LAYER (Backend)]
+      ├── Booking Service (quản lý state machine)
+      ├── Payment Service (cọc, hoàn cọc theo bậc)
+      ├── Scheduler / Worker (grace period, auto-cancel)
+      └── Notification Service (Zalo / SMS / call)
+               |
+               ▼
+[DATA LAYER] 
+      └── Relational DB (PostgreSQL)
+               ├── Customer
+               ├── Court
+               ├── Booking
+               ├── Payment
+               └── RefundLog
+```
+
+## 3. Lựa chọn Cơ sở dữ liệu
+**Công nghệ:** (chưa chốt)
+
+**Lý do:** 
+- Nghiệp vụ có chứa các giao dịch tài chính (cọc, hoàn cọc) nên rất cần đảm bảo tính toàn vẹn dữ liệu (**ACID**).
+- Các thực thể (bảng) có mối quan hệ chặt chẽ với nhau (Ví dụ: 1 booking có thể có nhiều payment, nhiều refund log).
 
 Lý do dùng database quan hệ: nghiệp vụ có giao dịch tài chính (cọc, hoàn cọc) cần tính toàn vẹn dữ liệu (ACID) và các bảng có quan hệ chặt với nhau (1 booking có nhiều payment, nhiều refund log).
 
