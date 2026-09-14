@@ -82,6 +82,7 @@ Chọn kiến trúc Monolithic (một backend duy nhất, một lần deploy) v�
 │ Web Booking (khách) │ Admin Dashboard (QL)│
 └─────────────────────┬─────────────────────────┘
 │ REST API (HTTPS)
+|
 ┌─────────────────────▼─────────────────────────┐
 │ APPLICATION LAYER (Backend) │
 │ Booking Service │ Payment Service │
@@ -91,9 +92,11 @@ Chọn kiến trúc Monolithic (một backend duy nhất, một lần deploy) v�
 │ auto-cancel) │ │
 └─────────────────────┬─────────────────────────┘
 │
+|
 ┌─────────────────────▼─────────────────────────┐
 │ DATA LAYER — Relational DB (PostgreSQL) │
 │ Customer, Court, Booking, Payment, RefundLog │
+
 └─────────────────────────────────────────────────┘
 
 Lý do dùng database quan hệ: nghiệp vụ có giao dịch tài chính (cọc, hoàn cọc) cần tính toàn vẹn dữ liệu (ACID) và các bảng có quan hệ chặt với nhau (1 booking có nhiều payment, nhiều refund log).
