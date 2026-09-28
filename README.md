@@ -1,4 +1,4 @@
-# Mini Football Field Management System — System Architecture & Design Specification
+# Mini Football Field Management System :System Architecture & Design Specification
 
 ## 1. Scope and architecture
 The existing **Mini Football Field Management Architecture** diagram is the architectural reference for this specification. It separates **Role-based interfaces**, **Business constants · single source of truth**, **Java Spring Boot · authenticated REST API · transactional domain services**, and **SQL Server · 15-table transactional persistence**. This document specifies their implementation without replacing or modifying the existing workspace ERD.
@@ -18,7 +18,7 @@ A booking occupies a half-open interval `[start_at, end_at)`: one booking may en
 
 ---
 
-## 2. Phase 0 — Business constants and guard rules
+## 2. Phase 0 :Business constants and guard rules
 Keep these values in a single versioned policy implementation used by commands, scheduled jobs, and tests. Do not duplicate calculations in controllers or clients.
 
 | Rule | Required behavior |
@@ -43,7 +43,7 @@ Keep these values in a single versioned policy implementation used by commands, 
 
 ---
 
-## 3. Phase 1 — Physical SQL Server schema
+## 3. Phase 1 :Physical SQL Server schema
 
 ### 3.1 Table inventory and relationships
 The **15** tables match the architecture diagram’s five persistence groups.
