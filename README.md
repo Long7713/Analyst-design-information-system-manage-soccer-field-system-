@@ -1,4 +1,4 @@
-`` ``// NHÓM 1: QUẢN LÝ NHÂN SỰ & CA LÀM
+# NHÓM 1: QUẢN LÝ NHÂN SỰ & CA LÀM
 Roles [icon: user] {
  ID int [pk]
  code varchar(20)
@@ -26,7 +26,7 @@ Work_shifts [icon: clock] {
  Created_at datetime2
 }
 
-// NHÓM 2: CRM & KHÁCH HÀNG
+# NHÓM 2: CRM & KHÁCH HÀNG
 Customers [icon: heart] {
  ID bigint [pk]
  Full_name nvarchar(100)
@@ -38,7 +38,7 @@ Customers [icon: heart] {
  updated_at datetime2
 }
 
-// NHÓM 3: ĐẶT SÂN & DÒNG TIỀN
+# NHÓM 3: ĐẶT SÂN & DÒNG TIỀN
 Fields [icon: grid] {
  ID int [pk]
  Name nvarchar(50)
@@ -107,7 +107,7 @@ Booking_events [icon: activity] {
  Created_at datetime2
 }
 
-// NHÓM 4: BÁN LẺ DỊCH VỤ (POS)
+# NHÓM 4: BÁN LẺ DỊCH VỤ (POS)
 Products [icon: package] {
  ID int [pk]
  Name nvarchar(100)
@@ -135,7 +135,7 @@ Service_order_items [icon: list] {
  Subtotal decimal(12,2)
 }
 
-// NHÓM 5: SỰ CỐ & THIẾT BỊ
+# NHÓM 5: SỰ CỐ & THIẾT BỊ
 Equipments [icon: tool] {
  ID int [pk]
  Name nvarchar(50)
