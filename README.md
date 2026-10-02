@@ -1,66 +1,70 @@
-# Mini Football Field Management System :System Architecture & Design Specification
+# Mini Football Field Management System (SFMS) ⚽
+> System Architecture & Design Specification
 
-## 1. Scope and architecture
+## 1. Scope and Architecture
+
 The existing **Mini Football Field Management Architecture** diagram is the architectural reference for this specification. It separates **Role-based interfaces**, **Business constants · single source of truth**, **Java Spring Boot · authenticated REST API · transactional domain services**, and **SQL Server · 15-table transactional persistence**. This document specifies their implementation without replacing or modifying the existing workspace ERD.
 
 | Concern | Design |
 | :--- | :--- |
-| Facility | 12 fields; operating hours **07:00–24:00** each service day |
-| Application | Java Spring Boot authenticated REST API, domain services, JPA/JDBC, SQL transactions |
-| Persistence | SQL Server; exactly 15 application tables specified below |
-| Staff · Receptionist | Operational rights: bookings, check-in, payments, POS, and incident reporting |
-| Manager / Owner | Full administrative rights, including pricing, inventory, staff, reports, and audit review |
-| Customers | No customer accounts. A unique phone number identifies a transparent CRM profile. |
-| Monetary values | VND; persist as `DECIMAL(18,2)`, never floating point |
-| Time | REST uses ISO 8601 timestamps with offsets. Booking boundaries use SQL Server `DATETIME2(7)` in the configured facility time zone; audit timestamps use UTC `DATETIME2(7)`. |
+| **Facility** | 12 fields; operating hours **07:00–24:00** each service day. |
+| **Application** | Java Spring Boot authenticated REST API for Admin/Staff dashboard, public read-only API for customer schedule viewing, domain services, JPA/JDBC, SQL transactions. |
+| **Persistence** | SQL Server; exactly 15 application tables specified below. |
+| **Staff (Receptionist)** | Operational rights: handling call-in booking requests, check-in, payments, POS, incident reporting, and sending manual notifications. |
+| **Manager / Owner** | Full administrative rights, including pricing, inventory, staff, reports, and audit review. |
+| **Customers** | **Read-only web portal access** to view field availability. Bookings are requested via direct contact (phone/Zalo). No customer accounts. A unique phone number identifies a transparent CRM profile. |
+| **Monetary values** | VND; persist as `DECIMAL(18,2)`, never floating point. |
+| **Time** | REST uses ISO 8601 timestamps with offsets. Booking boundaries use SQL Server `DATETIME2(7)` in the configured facility time zone; audit timestamps use UTC `DATETIME2(7)`. |
 
-A booking occupies a half-open interval `[start_at, end_at)`: one booking may end exactly when another begins. `24:00` is represented as `00:00` **on the following calendar date**, never as an invalid SQL time value. A booking must begin no earlier than 07:00 and end no later than the midnight closing that follows its start date. Pricing rules instead use integer minutes from the service-day midnight: `0–1440`, with `1440` representing 24:00.
+> **Note on Time Management:** A booking occupies a half-open interval `[start_at, end_at)`: one booking may end exactly when another begins. `24:00` is represented as `00:00` **on the following calendar date**, never as an invalid SQL time value. A booking must begin no earlier than 07:00 and end no later than the midnight closing that follows its start date. Pricing rules instead use integer minutes from the service-day midnight: `0–1440`, with `1440` representing 24:00.
 
 ---
 
-## 2. Phase 0 :Business constants and guard rules
+## 2. Phase 0: Business Constants and Guard Rules
+
 Keep these values in a single versioned policy implementation used by commands, scheduled jobs, and tests. Do not duplicate calculations in controllers or clients.
 
 | Rule | Required behavior |
 | :--- | :--- |
-| Deposit | **50% of the total booking value at booking confirmation.** The server calculates the booking value and deposit; client-supplied amounts are not authoritative. |
-| Cancellation refund, remaining time `t ≥ 24h` | Refund **100% of the deposit paid**. |
-| Cancellation refund, `3h ≤ t < 24h` | Refund **40% of the deposit paid**; retain the other 60%. |
-| Cancellation refund, `t < 3h` | Refund **0%**; retain the entire deposit as revenue. |
-| Time change | Permit only when **at least 3 hours remain before the current booking start**. Revalidate availability and pricing transactionally. |
-| Overtime eligibility | Booking must be `IN_PROGRESS` and the request must occur **from 20 minutes before its current end until, but not including, its current end**. |
-| Overtime charge | **50,000 VND per 30-minute block**. Charge `ceil(requested_extension_minutes / 30)` blocks; requested duration must be positive. |
-| Not attend | If the customer has not arrived **more than 20 minutes after start**, transition to `NOT_ATTEND`, retain **100% of the deposit**, and increment `Customers.all_time_boom` once. |
-| Salary | `total_hours × 40,000 VND`, using recorded work-shift hours. |
+| **Deposit** | **50% of the total booking value at booking confirmation.** The server calculates the booking value and deposit; client-supplied amounts are not authoritative. |
+| **Cancellation refund (`t ≥ 24h`)** | Refund **100% of the deposit paid**. |
+| **Cancellation refund (`3h ≤ t < 24h`)** | Refund **40% of the deposit paid**; retain the other 60%. |
+| **Cancellation refund (`t < 3h`)** | Refund **0%**; retain the entire deposit as revenue. |
+| **Time change** | Permit only when **at least 3 hours remain before the current booking start**. Revalidate availability and pricing transactionally. |
+| **Overtime eligibility** | Booking must be `IN_PROGRESS` and the request must occur **from 10 minutes before its current end until, but not including, its current end**. |
+| **Overtime charge** | **50,000 VND per 30-minute block**. Charge `ceil(requested_extension_minutes / 30)` blocks; requested duration must be positive. |
+| **Not attend** | If the customer has not arrived **more than 20 minutes after start**, transition to `NOT_ATTEND`, retain **100% of the deposit**, release the field, and increment `Customers.all_time_boom` once. |
+| **Notifications (Semi-automated)** | To avoid 3rd-party API overhead, the system auto-generates standardized text templates (containing booking details, deposit, policies) upon booking creation/cancellation. Staff copy and send these manually via personal/facility Zalo. |
+| **Salary** | `total_hours × 40,000 VND`, using recorded work-shift hours. |
 
-### Guard evaluation
-- Calculate `t = start_at − decision_time` at the server, using one transaction-consistent decision timestamp. At exactly 24 hours use the 100% tier; at exactly 3 hours use the 40% tier.
-- The not-attend threshold is strict: `decision_time > start_at + 20 minutes`. Check-in and not-attend must compete through the same locked booking row so neither can succeed after the other.
-- An overtime request at exactly `end_at − 20 minutes` qualifies; one at or after `end_at` does not. The extended end must still respect facility closing and must not overlap another active booking.
-- Price the original field interval from applicable `Pricing_rules`, then persist `Bookings.field_amount` as its snapshot. Persist overtime separately in `Bookings.overtime_amount`; the current booking value is their sum. Existing snapshots do not change when a pricing rule is edited.
-- On a time change, resolve and snapshot the replacement field price and reconcile the resulting deposit obligation against ledger entries. Do not silently overwrite a paid deposit, issue an unspecified refund, or fabricate a payment: post the appropriate financial action and audit event before completing the command.
-- Record retained deposit value as a `RETAINED` ledger entry. It represents a transfer to recognized revenue, **not another cash receipt**. Keep compensation fees for lost or damaged equipment outside the main booking invoice.
+### 🛡️ Guard Evaluation
+* Calculate `t = start_at − decision_time` at the server, using one transaction-consistent decision timestamp. At exactly 24 hours use the 100% tier; at exactly 3 hours use the 40% tier.
+* The not-attend threshold is strict: `decision_time > start_at + 20 minutes`. Check-in and not-attend must compete through the same locked booking row so neither can succeed after the other.
+* An overtime request at exactly `end_at − 10 minutes` qualifies; one at or after `end_at` does not. The extended end must still respect facility closing and must not overlap another active booking.
+* Price the original field interval from applicable `Pricing_rules`, then persist `Bookings.field_amount` as its snapshot. Persist overtime separately in `Bookings.overtime_amount`; the current booking value is their sum. Existing snapshots do not change when a pricing rule is edited.
+* On a time change, resolve and snapshot the replacement field price and reconcile the resulting deposit obligation against ledger entries. Do not silently overwrite a paid deposit, issue an unspecified refund, or fabricate a payment: post the appropriate financial action and audit event before completing the command.
+* Record retained deposit value as a `RETAINED` ledger entry. It represents a transfer to recognized revenue, **not another cash receipt**. Keep compensation fees for lost or damaged equipment outside the main booking invoice.
 
 ---
 
-## 3. Phase 1 :Physical SQL Server schema
+## 3. Phase 1: Physical SQL Server Schema
 
-### 3.1 Table inventory and relationships
-The **15** tables match the architecture diagram’s five persistence groups.
+### 3.1 Table Inventory and Relationships
+The **15** tables match the architecture diagram’s five persistence groups. 
 
 | Group | Tables | Count |
 | :--- | :--- | :--- |
-| HR & shifts | `Roles`, `Employees`, `Work_shifts` | 3 |
-| Customer CRM | `Customers` | 1 |
-| Booking, pricing & ledger | `Fields`, `Pricing_rules`, `Bookings`, `Payments`, `Invoices`, `Booking_events` | 6 |
-| POS & stock | `Products`, `Service_orders`, `Service_order_items` | 3 |
-| Equipment & incidents | `Equipments`, `Incident_reports` | 2 |
+| **HR & shifts** | `Roles`, `Employees`, `Work_shifts` | 3 |
+| **Customer CRM** | `Customers` | 1 |
+| **Booking, pricing & ledger** | `Fields`, `Pricing_rules`, `Bookings`, `Payments`, `Invoices`, `Booking_events` | 6 |
+| **POS & stock** | `Products`, `Service_orders`, `Service_order_items` | 3 |
+| **Equipment & incidents** | `Equipments`, `Incident_reports` | 2 |
 | **Total** | | **15** |
 
 `Bookings.customer_id → Customers.customer_id`; `Invoices.booking_id` is unique, enforcing **at most one invoice per booking**. Create that invoice in the booking transaction to enforce **exactly one** in application workflows. Optional `Service_orders.booking_id` associates a sale with a booking. `Incident_reports` reference both the booking and equipment, but their compensation is not added to `Invoices`.
 
-### 3.2 DBML
-The following DBML defines columns, SQL Server data types, PKs, FKs, and principal unique and lookup indexes. Apply the additional SQL Server constraints and concurrency controls in §3.3 through versioned migrations.
+### 3.2 DBML Definition
+The following DBML defines columns, SQL Server data types, PKs, FKs, and principal unique and lookup indexes. Apply the additional SQL Server constraints and concurrency controls through versioned migrations.
 
 ```dbml
 Table Roles {
