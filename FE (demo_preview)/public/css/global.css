@@ -1,0 +1,133 @@
+/**
+ * SANBONGLON — Global Reset, Typography & Utility Rules
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--text-primary);
+  background-color: var(--bg-cream);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-cream);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  overflow-x: hidden;
+}
+
+/* Editorial Headings — Newsreader */
+h1, h2, .font-editorial {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Technical Metadata, Timestamps, IDs & Tabular Figures — Space Mono */
+.font-mono-tech, code, pre, .tabular-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessible Focus States */
+:focus-visible {
+  outline: 2px solid var(--accent-lime);
+  outline-offset: 2px;
+}
+
+/* Custom Subtle Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-sand);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Glass Surface Fallbacks */
+.glass-nav {
+  background-color: var(--glass-nav-bg);
+  backdrop-filter: var(--glass-nav-blur);
+  -webkit-backdrop-filter: var(--glass-nav-blur);
+  border-color: var(--glass-nav-border);
+}
+
+.glass-overlay {
+  background-color: var(--glass-overlay-bg);
+  backdrop-filter: var(--glass-overlay-blur);
+  -webkit-backdrop-filter: var(--glass-overlay-blur);
+  border: 1px solid var(--glass-overlay-border);
+  box-shadow: var(--shadow-md);
+}
+
+.glass-modal-backdrop {
+  background-color: var(--glass-modal-backdrop);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.glass-drawer {
+  background-color: var(--glass-modal-bg);
+  backdrop-filter: var(--glass-modal-blur);
+  -webkit-backdrop-filter: var(--glass-modal-blur);
+}
+
+.glass-toolbar {
+  background-color: var(--glass-toolbar-bg);
+  backdrop-filter: var(--glass-toolbar-blur);
+  -webkit-backdrop-filter: var(--glass-toolbar-blur);
+  border: 1px solid var(--glass-toolbar-border);
+}
+
+@supports not (backdrop-filter: blur(8px)) {
+  .glass-nav {
+    background-color: var(--bg-cream);
+  }
+  .glass-overlay {
+    background-color: var(--bg-paper);
+  }
+  .glass-drawer {
+    background-color: var(--bg-cream);
+  }
+  .glass-toolbar {
+    background-color: var(--bg-sand);
+  }
+}

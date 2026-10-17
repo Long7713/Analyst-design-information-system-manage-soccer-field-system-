@@ -1,0 +1,40 @@
+<!-- SANBONGLON — Reusable Sidebar Fragment (components/sidebar.html) -->
+<div class="sbl-sidebar-backdrop" id="sblSidebarBackdrop" data-action="close-mobile-sidebar" aria-hidden="true"></div>
+<aside class="sbl-sidebar" id="sblSidebar" aria-label="Điều hướng hệ thống SANBONGLON">
+  <div class="sbl-sidebar-brand">
+    <a href="/pages/dashboard.html" class="sbl-brand-link" data-nav-id="tong-quan">
+      <span class="sbl-brand-mark" id="sblBrandLogo">SB</span>
+      <span class="sbl-brand-text">
+        <span class="sbl-brand-name" id="sblBrandName">SANBONGLON</span>
+        <span class="sbl-brand-sub" id="sblBrandSub">CENTRAL PITCH OPS</span>
+      </span>
+    </a>
+    <button
+      type="button"
+      class="sbl-sidebar-toggle"
+      id="sblSidebarToggleBtn"
+      aria-label="Thu gọn hoặc mở rộng thanh bên"
+      title="Thu gọn / Mở rộng (Ctrl+B)"
+    >
+      <svg class="sbl-icon-collapse" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect width="18" height="18" x="3" y="3" rx="2"/>
+        <path d="M9 3v18"/>
+        <path d="m16 15-3-3 3-3"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sbl-sidebar-nav" id="sblSidebarNav" role="navigation" aria-label="Menu vận hành chính">
+    <!-- Dynamically populated from js/sidebar-config.js -->
+  </nav>
+
+  <div class="sbl-sidebar-footer" id="sblSidebarFooter">
+    <div class="sbl-operator-card">
+      <span class="sbl-operator-avatar" id="sblOperatorInitials">k2</span>
+      <div class="sbl-operator-meta">
+        <div class="sbl-operator-name" id="sblOperatorName">Lê Hoàng Nam</div>
+        <div class="sbl-operator-role" id="sblOperatorRole">Ca Chiều · Điều phối viên</div>
+      </div>
+    </div>
+  </div>
+</aside>

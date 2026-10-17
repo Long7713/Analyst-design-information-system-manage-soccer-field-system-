@@ -1,0 +1,6 @@
+{
+  "name": "SANBONGLON — Hệ Thống Quản Lý & Điều Phối Sân Bóng",
+  "description": "Hệ thống điều phối lịch sân, POS bán hàng tại quầy, quản lý khách hàng, kho hàng, thiết bị và phân tích tài chính vận hành sân bóng SANBONGLON theo phong cách Warm Editorial Studio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

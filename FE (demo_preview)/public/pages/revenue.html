@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Báo Cáo Doanh Thu & Tài Chính — SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="doanh-thu">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point (Populated dynamically from /components/sidebar.html) -->
+      <div id="sblSidebarMount"></div>
+
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu điều hướng">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>TÀI CHÍNH & QUẢN TRỊ</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Báo Cáo Doanh Thu & Tài Chính</span>
+            </div>
+          </div>
+          <div class="sbl-header-right">
+            <a href="/" class="btn btn-secondary btn-sm">Mở Bản Tương Tác Đầy Đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Đã mở biểu mẫu tạo phiếu đặt sân mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Báo Cáo Doanh Thu & Tài Chính</h1>
+              <p class="sbl-page-subtitle">Sổ quỹ thu chi, đối soát chuyển khoản VietQR, doanh thu thuê sân và bán hàng POS</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Doanh thu thuê sân & Cọc</span></div>
+          <div class="sbl-kpi-value">3.030.000 ₫</div>
+          <div class="sbl-kpi-meta"><span>Đã quyết toán trong ca</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Doanh thu bán hàng POS</span></div>
+          <div class="sbl-kpi-value">160.000 ₫</div>
+          <div class="sbl-kpi-meta"><span>Quầy trung tâm</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Chi phí bảo trì phát sinh</span></div>
+          <div class="sbl-kpi-value">- 650.000 ₫</div>
+          <div class="sbl-kpi-meta"><span>Vật tư đèn pha Sân 05</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Thực thu ròng (Net Cashflow)</span></div>
+          <div class="sbl-kpi-value">2.540.000 ₫</div>
+          <div class="sbl-kpi-meta"><span>Khớp tồn quỹ thực tế</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Sổ Giao Dịch Tài Chính Chi Tiết</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Mã Chứng Từ</th><th>Thời Gian</th><th>Điểm Thu</th><th>Khách Hàng / Nội Dung</th><th>Phương Thức</th><th>Số Tiền</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">PT-261017-01</td><td>17/10/2026 · 18:10</td><td>Sân 12 (7 người)</td><td>FC Thái Bình Dương</td><td>Chuyển khoản QR</td><td>+1.360.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">PT-261017-02</td><td>17/10/2026 · 17:45</td><td>Sân 09 (7 người)</td><td>FC Doanh Nhân Trẻ</td><td>Chuyển khoản QR</td><td>+500.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">PT-261017-03</td><td>17/10/2026 · 17:20</td><td>Quầy POS Trung tâm</td><td>FC Kiến Trúc Trẻ (Sân 01)</td><td>Tiền mặt</td><td>+160.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">PC-261017-01</td><td>17/10/2026 · 09:45</td><td>Sân 05 (5 người)</td><td>Vật tư điện chiếu sáng</td><td>Tiền mặt</td><td>-650.000 ₫</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

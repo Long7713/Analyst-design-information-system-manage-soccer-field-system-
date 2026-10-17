@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thống Kê Vận Hành & Phân Tích Chuyên Sâu — SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="thong-ke">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point (Populated dynamically from /components/sidebar.html) -->
+      <div id="sblSidebarMount"></div>
+
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu điều hướng">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>TÀI CHÍNH & QUẢN TRỊ</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Thống Kê Vận Hành & Phân Tích Chuyên Sâu</span>
+            </div>
+          </div>
+          <div class="sbl-header-right">
+            <a href="/" class="btn btn-secondary btn-sm">Mở Bản Tương Tác Đầy Đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Đã mở biểu mẫu tạo phiếu đặt sân mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Thống Kê Vận Hành & Phân Tích Chuyên Sâu</h1>
+              <p class="sbl-page-subtitle">5 phân khu phân tích: 1. Thống kê sân · 2. Khách hàng & rủi ro · 3. Hiệu suất nhân sự · 4. Doanh thu dòng tiền · 5. Dịch vụ & tồn kho thiết bị</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>1. Thống kê sân (Công suất TB)</span></div>
+          <div class="sbl-kpi-value">86.4%</div>
+          <div class="sbl-kpi-meta"><span>12 sân hoạt động 07:00–24:00</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>2. Khách hàng & Rủi ro Boom</span></div>
+          <div class="sbl-kpi-value">1.8%</div>
+          <div class="sbl-kpi-meta"><span>Tỷ lệ tái ký cố định 94.8%</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>3. Hiệu suất nhân sự (Check-in)</span></div>
+          <div class="sbl-kpi-value">42 giây</div>
+          <div class="sbl-kpi-meta"><span>100% ca trực khớp quỹ</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>4. Doanh thu & 5. Dịch vụ POS</span></div>
+          <div class="sbl-kpi-value">78.4% QR</div>
+          <div class="sbl-kpi-meta"><span>Biên lợi nhuận gộp 68.5%</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Tổng Hợp Chỉ Số 5 Phân Khu Phân Tích Chuyên Sâu</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Phân Khu Phân Tích</th><th>Chỉ Số Trọng Tâm</th><th>Kết Quả Kỳ Này</th><th>So Với Kỳ Trước</th><th>Đánh Giá</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">1. Thống kê sân</td><td>Tỷ lệ lấp đầy giờ vàng (17:00–21:00)</td><td>91.6%</td><td>+4.2%</td><td>Vượt mục tiêu</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">2. Khách hàng và rủi ro</td><td>Tỷ lệ Boom sân không báo trước</td><td>1.8%</td><td>-2.4%</td><td>Kiểm soát tốt</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">3. Hiệu suất nhân sự</td><td>Thời gian trung bình làm thủ tục nhận sân</td><td>42 giây</td><td>-11 giây</td><td>Rất nhanh</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">4. Doanh thu dòng tiền</td><td>Tỷ lệ thanh toán không tiền mặt (VietQR)</td><td>78.4%</td><td>+9.1%</td><td>Tối ưu đối soát</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">5. Dịch vụ và tồn kho thiết bị</td><td>Tỷ lệ đơn đặt sân có mua kèm nước/Bib</td><td>64.2%</td><td>+6.5%</td><td>Tăng trưởng tốt</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

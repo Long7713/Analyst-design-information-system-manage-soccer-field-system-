@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Khách Hàng & Đội Bóng — SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="khach-hang">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point (Populated dynamically from /components/sidebar.html) -->
+      <div id="sblSidebarMount"></div>
+
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu điều hướng">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>ĐIỀU PHỐI & LỊCH SÂN</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Quản Lý Khách Hàng & Đội Bóng</span>
+            </div>
+          </div>
+          <div class="sbl-header-right">
+            <a href="/" class="btn btn-secondary btn-sm">Mở Bản Tương Tác Đầy Đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Đã mở biểu mẫu tạo phiếu đặt sân mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Quản Lý Khách Hàng & Đội Bóng</h1>
+              <p class="sbl-page-subtitle">Hồ sơ đội trưởng, hợp đồng cố định tháng và chỉ báo rủi ro Boom sân</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Tổng đội bóng đăng ký</span></div>
+          <div class="sbl-kpi-value">128 đội</div>
+          <div class="sbl-kpi-meta"><span>42 đội hợp đồng cố định tháng</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Khách VIP & Doanh nghiệp</span></div>
+          <div class="sbl-kpi-value">24 đội</div>
+          <div class="sbl-kpi-meta"><span>Chi tiêu > 25 triệu/năm</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Đội có cảnh báo Boom</span></div>
+          <div class="sbl-kpi-value">3 đội</div>
+          <div class="sbl-kpi-meta"><span>Bắt buộc cọc 100% trước giờ đá</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Tỷ lệ giữ chân khách quen</span></div>
+          <div class="sbl-kpi-value">94.8%</div>
+          <div class="sbl-kpi-meta"><span>Tái ký hợp đồng quý IV</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Hồ Sơ Đội Bóng & Chỉ Báo Tín Nhiệm</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Mã KH</th><th>Đội Bóng</th><th>Đội Trưởng & SĐT</th><th>Phân Hạng</th><th>Số Trận</th><th>Lịch Sử Boom</th><th>Tổng Chi Tiêu</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">KH-001</td><td>FC Bình Thạnh United</td><td>Nguyễn Minh Tuấn · 0909 412 889</td><td>Khách cố định tháng</td><td>46</td><td>Uy tín tốt (0 boom)</td><td>28.450.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">KH-002</td><td>FC Doanh Nhân Trẻ</td><td>Nguyễn Công Phượng · 0901 999 456</td><td>Khách VIP</td><td>38</td><td>Uy tín tốt (0 boom)</td><td>49.200.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">KH-004</td><td>FC Tự Do Quận 3</td><td>Vũ Đình Trọng · 0965 901 238</td><td>Cảnh báo Boom</td><td>6</td><td>Cảnh báo (2 boom)</td><td>1.850.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">KH-006</td><td>FC Sông Lam Miền Nam</td><td>Quế Ngọc Hải · 0913 880 712</td><td>Khách VIP</td><td>34</td><td>Uy tín tốt (0 boom)</td><td>41.600.000 ₫</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

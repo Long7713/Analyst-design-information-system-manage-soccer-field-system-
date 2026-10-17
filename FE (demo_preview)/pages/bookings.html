@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Phiếu Đặt Sân & Nhận Sân — SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="dat-san">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point (Populated dynamically from /components/sidebar.html) -->
+      <div id="sblSidebarMount"></div>
+
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu điều hướng">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>ĐIỀU PHỐI & LỊCH SÂN</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Quản Lý Phiếu Đặt Sân & Nhận Sân</span>
+            </div>
+          </div>
+          <div class="sbl-header-right">
+            <a href="/" class="btn btn-secondary btn-sm">Mở Bản Tương Tác Đầy Đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Đã mở biểu mẫu tạo phiếu đặt sân mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Quản Lý Phiếu Đặt Sân & Nhận Sân</h1>
+              <p class="sbl-page-subtitle">Theo dõi tiền cọc giữ sân, công nợ còn thu tại quầy và lịch đặt sân theo ca trực</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Tổng phiếu đặt trong ngày</span></div>
+          <div class="sbl-kpi-value">18 phiếu</div>
+          <div class="sbl-kpi-meta"><span>Cụm 12 sân</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Tổng tiền cọc đã nhận</span></div>
+          <div class="sbl-kpi-value">5.930.000 ₫</div>
+          <div class="sbl-kpi-meta"><span>Qua VietQR & Tiền mặt</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Còn phải thu tại quầy</span></div>
+          <div class="sbl-kpi-value">5.910.000 ₫</div>
+          <div class="sbl-kpi-meta"><span>Thu khi kết thúc trận</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Tỷ lệ nhận sân đúng giờ</span></div>
+          <div class="sbl-kpi-value">94.4%</div>
+          <div class="sbl-kpi-meta"><span>17 / 18 phiếu</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Danh Sách Chi Tiết Phiếu Đặt Sân</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Mã Phiếu</th><th>Sân</th><th>Khung Giờ</th><th>Đội Bóng</th><th>Tổng Tiền</th><th>Đã Cọc</th><th>Còn Thu</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SBL-24101</td><td>Sân 01</td><td>07:30 – 09:00</td><td>FC Bình Thạnh United</td><td>430.000 ₫</td><td>330.000 ₫</td><td>100.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SBL-24102</td><td>Sân 01</td><td>17:30 – 19:00</td><td>FC Kiến Trúc Trẻ</td><td>700.000 ₫</td><td>200.000 ₫</td><td>500.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SBL-24113</td><td>Sân 09</td><td>17:30 – 19:00</td><td>FC Doanh Nhân Trẻ</td><td>1.400.000 ₫</td><td>500.000 ₫</td><td>900.000 ₫</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SBL-24117</td><td>Sân 12</td><td>17:00 – 19:00</td><td>FC Thái Bình Dương</td><td>1.360.000 ₫</td><td>1.160.000 ₫</td><td>200.000 ₫</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

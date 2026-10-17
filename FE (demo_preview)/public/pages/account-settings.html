@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tài Khoản, Bảo Mật & Cấu Hình Hệ Thống — SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="cai-dat-he-thong">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point (Populated dynamically from /components/sidebar.html) -->
+      <div id="sblSidebarMount"></div>
+
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu điều hướng">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>TÀI CHÍNH & QUẢN TRỊ</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Tài Khoản, Bảo Mật & Cấu Hình Hệ Thống</span>
+            </div>
+          </div>
+          <div class="sbl-header-right">
+            <a href="/" class="btn btn-secondary btn-sm">Mở Bản Tương Tác Đầy Đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Đã mở biểu mẫu tạo phiếu đặt sân mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Tài Khoản, Bảo Mật & Cấu Hình Hệ Thống</h1>
+              <p class="sbl-page-subtitle">Quản lý thông tin ca trực, đổi mật khẩu bảo mật và tùy chỉnh cấu hình Sidebar tập trung</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Tài khoản đang trực</span></div>
+          <div class="sbl-kpi-value">Lê Hoàng Nam</div>
+          <div class="sbl-kpi-meta"><span>Mã NV: SBL-NV01</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Ca làm việc hiện tại</span></div>
+          <div class="sbl-kpi-value">Ca Chiều</div>
+          <div class="sbl-kpi-meta"><span>14:00 – 22:00</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Xác thực 2 lớp (2FA)</span></div>
+          <div class="sbl-kpi-value">Đang bật</div>
+          <div class="sbl-kpi-meta"><span>Bảo vệ thao tác hủy phiếu</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Cấu hình Sidebar dùng chung</span></div>
+          <div class="sbl-kpi-value">Đồng bộ 12 trang</div>
+          <div class="sbl-kpi-meta"><span>js/sidebar-config.js</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Phiên Đăng Nhập Thiết Bị Trong Ca Trực</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Thiết Bị / Trình Duyệt</th><th>Vị Trí Quầy</th><th>Địa Chỉ IP</th><th>Thời Điểm Đăng Nhập</th><th>Trạng Thái</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">MacBook Pro · Chrome 130</td><td>Quầy Điều Phối Trung Tâm</td><td>192.168.1.14</td><td>17/10/2026 · 14:00</td><td>Phiên hiện tại</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">iPad Air POS · Safari</td><td>Quầy Nước & Phụ Kiện</td><td>192.168.1.18</td><td>17/10/2026 · 14:02</td><td>Đang hoạt động</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
