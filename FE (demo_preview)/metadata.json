@@ -1,0 +1,8 @@
+{
+  "name": "SANBONGLON - Trình Quản Lý, Mã Nguồn & Tài Liệu",
+  "description": "Hệ thống quản lý điều phối sân bóng SANBONGLON kèm Trình xem Mã nguồn (Source Code Explorer) và Tài liệu thiết kế chi tiết (Documentation Viewer).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
