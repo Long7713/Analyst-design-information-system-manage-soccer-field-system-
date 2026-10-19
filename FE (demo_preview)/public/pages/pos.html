@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dịch Vụ & POS Bán Hàng Tại Quầy – SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="dich-vu">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point -->
+      <div id="sblSidebarMount"></div>
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>DỊCH VỤ & CẬT CHẤT</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Dịch Vụ & POS Bán Hàng Tại Quầy</span>
+            </div>
+          </div>
+          <!-- Live Top Bar Clock (Thứ Giờ:phút:giây) -->
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="sblTopClock" class="font-mono-tech" style="background:var(--bg-sand);padding:4px 12px;border-radius:var(--radius-xs);font-size:12px;font-weight:700;border:1px solid var(--border-color);">
+              Đang tải giờ...
+            </div>
+            <a href="/" class="btn btn-secondary btn-sm">Mở giao diện đầy đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Mở tạo phiếu mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Dịch Vụ & POS Bán Hàng Tại Quầy</h1>
+              <p class="sbl-page-subtitle">Danh mục giải khát ướp lạnh, thuê giày Kamito, áo Bib và dịch vụ trọng tài</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Doanh số POS trong ca</span></div>
+          <div class="sbl-kpi-value">1.465.000 đ</div>
+          <div class="sbl-kpi-meta"><span>32 lượt xuất hàng</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Nước giải khát bán</span></div>
+          <div class="sbl-kpi-value">84 chai</div>
+          <div class="sbl-kpi-meta"><span>Aquafina, Revive, Pocari</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Lượt thuê giày & Áo Bib</span></div>
+          <div class="sbl-kpi-value">14 bộ</div>
+          <div class="sbl-kpi-meta"><span>Đã thu hồi 9 bộ sau trận</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Gán đơn vào ca sân</span></div>
+          <div class="sbl-kpi-value">88%</div>
+          <div class="sbl-kpi-meta"><span>Thanh toán gộp cuối trận</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Danh Mục Sản Phẩm & Dịch Vụ POS Tại Quầy</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Mã SKU</th><th>Tên Sản Phẩm / Dịch Vụ</th><th>Danh Mục</th><th>Đơn Giá</th><th>Tồn Quầy</th><th>Thao Tác</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">DRK-AQUA-500</td><td>Nước suối Aquafina 500ml</td><td>Nước giải khát</td><td>10.000 đ</td><td>240 Chai</td><td>Thêm vào giỏ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">DRK-REV-500</td><td>Revive Chanh Muối 500ml</td><td>Nước giải khát</td><td>15.000 đ</td><td>164 Chai</td><td>Thêm vào giỏ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">DRK-POC-500</td><td>Pocari Sweat Ion 500ml</td><td>Nước giải khát</td><td>20.000 đ</td><td>92 Chai</td><td>Thêm vào giỏ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">RNT-SHOE-KMT</td><td>Thuê giày Kamito Tuấn Anh</td><td>Thuê & Phụ kiện</td><td>35.000 đ</td><td>28 Đôi</td><td>Thêm vào giỏ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">RNT-BIB-SET</td><td>Thuê áo Bib (10 áo)</td><td>Thuê & Phụ kiện</td><td>40.000 đ</td><td>16 Bộ</td><td>Thêm vào giỏ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SRV-REF-STD</td><td>Thuê trọng tài điều khiển trận</td><td>Dịch vụ thi đấu</td><td>250.000 đ</td><td>Sẵn sàng</td><td>Thêm vào giỏ</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+/**
+ * SANBONGLON – Warm Editorial Studio Design Tokens
+ * Single Source of Truth for Colors, Typography, Spacing, Glass & Motion
+ */
+
+:root {
+  /* Core Palette – Warm Editorial Studio */
+  --bg-cream: #F4F1EA;
+  --bg-sand: #EBE6DC;
+  --bg-raised: #DFD8CB;
+  --bg-paper: #FAF8F4;
+  --bg-espresso: #1C1A17;
+  --bg-espresso-soft: #282520;
+
+  /* Brand & Accent */
+  --accent-lime: #7AC238;
+  --accent-lime-hover: #6AB02B;
+  --accent-lime-soft: rgba(122, 194, 56, 0.16);
+  --accent-lime-border: rgba(122, 194, 56, 0.45);
+  --accent-moss: #586955;
+  --accent-moss-soft: rgba(88, 105, 85, 0.14);
+
+  /* Typography Colors */
+  --text-primary: #1C1A17;
+  --text-secondary: #4A453E;
+  --text-muted: #766E63;
+  --text-on-dark: #F4F1EA;
+  --text-on-dark-muted: #B8B0A4;
+  --text-on-lime: #151910;
+
+  /* Borders & Hairlines */
+  --border-color: #D3CBBF;
+  --border-subtle: rgba(28, 26, 23, 0.08);
+  --border-strong: #B8AFA0;
+  --border-focus: #586955;
+
+  /* Semantic Operational Status Colors */
+  --status-success-text: #235732;
+  --status-success-bg: #E3EFE6;
+  --status-success-border: #A5CEA9;
+  --status-warning-text: #8F520D;
+  --status-warning-bg: #F7ECDC;
+  --status-warning-border: #DEB986;
+  --status-danger-text: #922525;
+  --status-danger-bg: #F6E3E3;
+  --status-danger-border: #DBA6A6;
+  --status-info-text: #1F4E75;
+  --status-info-bg: #E3ECF5;
+  --status-info-border: #A3C1DC;
+  --status-neutral-text: #4A453E;
+  --status-neutral-bg: #E7E2D8;
+  --status-neutral-border: #CCC4B6;
+
+  /* Typography Families (2+1 Rule: Newsreader + Manrope + Space Mono) */
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Font Sizes & Line Heights */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.8125rem;    /* 13px */
+  --text-base: 0.875rem;   /* 14px – operational default */
+  --text-md: 0.9375rem;    /* 15px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.375rem;     /* 22px */
+  --text-2xl: 1.75rem;     /* 28px */
+  --text-3xl: 2.25rem;     /* 36px */
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* Spacing Scale */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+
+  /* Radii – Restrained Editorial Geometry */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+
+  /* Control Dimensions */
+  --control-height-sm: 32px;
+  --control-height-md: 38px;
+  --control-height-lg: 44px;
+
+  /* Layout Shell Dimensions */
+  --sidebar-width-expanded: 256px;
+  --sidebar-width-collapsed: 72px;
+  --header-height: 60px;
+
+  /* Z-Index Layers */
+  --z-base: 1;
+  --z-sticky: 20;
+  --z-header: 30;
+  --z-sidebar: 40;
+  --z-dropdown: 50;
+  --z-drawer-backdrop: 60;
+  --z-drawer: 70;
+  --z-modal-backdrop: 80;
+  --z-modal: 90;
+  --z-toast: 100;
+  --z-tooltip: 110;
+
+  /* Restrained Ambient Shadows */
+  --shadow-xs: 0 1px 2px rgba(28, 26, 23, 0.04);
+  --shadow-sm: 0 2px 6px rgba(28, 26, 23, 0.06);
+  --shadow-md: 0 8px 24px rgba(28, 26, 23, 0.08);
+  --shadow-lg: 0 16px 40px rgba(28, 26, 23, 0.14);
+
+  /* 4 Shared Glass Surface Variants (Subtle Warm Editorial Glass) */
+  --glass-nav-bg: rgba(244, 241, 234, 0.84);
+  --glass-nav-dark-bg: rgba(28, 26, 23, 0.94);
+  --glass-nav-border: rgba(211, 203, 191, 0.72);
+  --glass-nav-blur: blur(12px);
+
+  --glass-overlay-bg: rgba(250, 248, 244, 0.90);
+  --glass-overlay-border: rgba(211, 203, 191, 0.85);
+  --glass-overlay-blur: blur(14px);
+
+  --glass-modal-bg: rgba(244, 241, 234, 0.95);
+  --glass-modal-backdrop: rgba(28, 26, 23, 0.42);
+  --glass-modal-blur: blur(8px);
+
+  --glass-toolbar-bg: rgba(235, 230, 220, 0.78);
+  --glass-toolbar-border: rgba(211, 203, 191, 0.80);
+  --glass-toolbar-blur: blur(10px);
+
+  /* Motion & Transitions */
+  --duration-fast: 140ms;
+  --duration-normal: 200ms;
+  --duration-slow: 280ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
