@@ -33,6 +33,63 @@ export const OPERATING_START_HOUR = 7;
 export const OPERATING_END_HOUR = 24;
 export const TOTAL_OPERATING_HOURS = OPERATING_END_HOUR - OPERATING_START_HOUR; // 17 hours
 
+/** Mọi mốc giờ bắt đầu hợp lệ trên timeline: 07:00, 07:30, ... 23:30. */
+export const START_HOUR_OPTIONS: number[] = Array.from(
+  { length: TOTAL_OPERATING_HOURS * 2 },
+  (_, i) => OPERATING_START_HOUR + i * 0.5
+);
+
+/** Kéo giờ bắt đầu về mốc gần nhất sao cho ca đá vẫn kết thúc trước giờ đóng cửa. */
+export function clampStartHour(startHour: number, durationHours: number): number {
+  const latest = OPERATING_END_HOUR - durationHours;
+  const clamped = Math.max(OPERATING_START_HOUR, Math.min(latest, startHour));
+  return Math.floor(clamped * 2) / 2;
+}
+
+/** Số giờ của phiếu nằm trong khoảng [from, to). */
+export function bookingOverlapHours(
+  booking: Pick<PitchBooking, 'startHour' | 'durationHours'>,
+  from: number,
+  to: number
+): number {
+  const start = Math.max(booking.startHour, from);
+  const end = Math.min(booking.startHour + booking.durationHours, to);
+  return Math.max(0, end - start);
+}
+
+/** % lấp đầy của `pitchCount` sân trong khung [from, to), bỏ qua phiếu hủy và boom. */
+export function occupancyPercent(
+  bookings: PitchBooking[],
+  from: number,
+  to: number,
+  pitchCount: number
+): number {
+  const capacity = pitchCount * (to - from);
+  if (capacity <= 0) return 0;
+  const booked = bookings
+    .filter((b) => b.status !== 'cancelled' && b.status !== 'boom')
+    .reduce((sum, b) => sum + bookingOverlapHours(b, from, to), 0);
+  return Math.min(100, (booked / capacity) * 100);
+}
+
+/**
+ * Giá sân tính theo từng nửa giờ: trước 16:00 giá ban ngày, 16:00–21:30 giờ vàng,
+ * từ 21:30 giá giờ muộn. Ca vắt qua nhiều khung sẽ tính đúng từng khung.
+ */
+export function calculatePitchPrice(
+  rates: { baseRateMorning: number; baseRatePrime: number; baseRateLate: number },
+  startHour: number,
+  durationHours: number
+): number {
+  let total = 0;
+  for (let t = startHour; t < startHour + durationHours - 1e-9; t += 0.5) {
+    const slotLen = Math.min(0.5, startHour + durationHours - t);
+    const rate = t < 16 ? rates.baseRateMorning : t < 21.5 ? rates.baseRatePrime : rates.baseRateLate;
+    total += rate * slotLen;
+  }
+  return Math.round(total);
+}
+
 export function formatHourLabel(hourFloat: number): string {
   const hours = Math.floor(hourFloat);
   const mins = Math.round((hourFloat - hours) * 60);

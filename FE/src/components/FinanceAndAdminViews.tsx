@@ -43,7 +43,11 @@ export const RevenueView: React.FC<RevenueViewProps> = ({ transactions, onExport
     const expense = transactions
       .filter((t) => t.amount < 0)
       .reduce((s, t) => s + Math.abs(t.amount), 0);
-    const netCashflow = pitchRev + posRev - expense;
+    // Tiền "Chờ đối soát" / công nợ chưa thu thật nên không tính vào thực thu ròng.
+    const settledIncome = transactions
+      .filter((t) => t.amount > 0 && t.status === 'Đã quyết toán')
+      .reduce((s, t) => s + t.amount, 0);
+    const netCashflow = settledIncome - expense;
     return { pitchRev, posRev, expense, netCashflow };
   }, [transactions]);
 

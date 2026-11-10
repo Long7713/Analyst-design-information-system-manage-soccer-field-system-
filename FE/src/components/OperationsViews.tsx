@@ -18,6 +18,7 @@ import {
   formatVND,
   calculateBookingFinancials,
   classifyCustomerRisk,
+  occupancyPercent,
 } from '../utils/sanbonglonLogic';
 import {
   PITCH_LIST,
@@ -60,15 +61,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const openIncidents = incidents.filter((i) => i.status !== 'Đã khắc phục');
   const lowStockItems = products.filter((p) => p.stock <= p.minStock);
 
-  const hourlyBars = [
-    { label: '07-09h', pct: 58 },
-    { label: '09-11h', pct: 42 },
-    { label: '14-16h', pct: 35 },
-    { label: '16-18h', pct: 83 },
-    { label: '18-20h', pct: 96 },
-    { label: '20-22h', pct: 88 },
-    { label: '22-24h', pct: 50 },
-  ];
+  const boomBookings = bookings.filter((b) => b.status === 'boom');
+  const pendingBookings = activeBookings.filter((b) => b.status === 'pending');
+
+  const hourlyBars = (
+    [
+      [7, 9],
+      [9, 11],
+      [14, 16],
+      [16, 18],
+      [18, 20],
+      [20, 22],
+      [22, 24],
+    ] as const
+  ).map(([from, to]) => ({
+    label: `${String(from).padStart(2, '0')}-${String(to).padStart(2, '0')}h`,
+    pct: Math.round(occupancyPercent(bookings, from, to, PITCH_LIST.length)),
+  }));
+
+  const primeOccupancy = occupancyPercent(bookings, 17, 21, PITCH_LIST.length);
+  const primePitchCount = PITCH_LIST.filter((pitch) =>
+    activeBookings.some(
+      (b) =>
+        b.pitchId === pitch.id &&
+        b.status !== 'boom' &&
+        b.startHour < 21 &&
+        b.startHour + b.durationHours > 17
+    )
+  ).length;
 
   return (
     <div>
@@ -108,9 +128,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <div className="sbl-kpi-value">{formatVND(totalRevenueToday)}</div>
           <div className="sbl-kpi-meta">
-            <span>{activeBookings.length} ca đã nhận sân</span>
+            <span>{checkedInCount} ca đã nhận sân</span>
             <span aria-hidden="true">•</span>
-            <span>+14.2% so với T7 tuần trước</span>
+            <span>{activeBookings.length} ca trong ngày</span>
           </div>
         </div>
 
@@ -119,9 +139,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span>Công suất khung giờ vàng (17h–21h)</span>
             <Calendar size={16} strokeWidth={1.8} style={{ color: 'var(--status-info-text)' }} />
           </div>
-          <div className="sbl-kpi-value">91.6%</div>
+          <div className="sbl-kpi-value">{primeOccupancy.toFixed(1)}%</div>
           <div className="sbl-kpi-meta">
-            <span>11 / 12 sân kín lịch</span>
+            <span>{primePitchCount} / {PITCH_LIST.length} sân có lịch</span>
             <span aria-hidden="true">•</span>
             <span>{checkedInCount} ca đang đá</span>
           </div>
@@ -133,12 +153,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <TriangleAlert size={16} strokeWidth={1.8} style={{ color: 'var(--status-danger-text)' }} />
           </div>
           <div className="sbl-kpi-value">
-            {activeBookings.filter((b) => b.status === 'boom' || b.status === 'pending').length} ca
+            {boomBookings.length + pendingBookings.length} ca
           </div>
           <div className="sbl-kpi-meta">
-            <span>1 đơn Boom (Sân 03)</span>
+            <span>{boomBookings.length} đơn Boom</span>
             <span aria-hidden="true">•</span>
-            <span>2 đơn chờ chuyển cọc</span>
+            <span>{pendingBookings.length} đơn chờ chuyển cọc</span>
           </div>
         </div>
 
@@ -179,9 +199,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="sbl-panel-body">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {PITCH_LIST.map((pitch) => {
-                const currentBk = activeBookings.find(
-                  (b) => b.pitchId === pitch.id && b.startHour >= 16 && b.startHour <= 20
-                );
+                const pitchBks = bookings
+                  .filter((b) => b.pitchId === pitch.id && b.status !== 'cancelled')
+                  .sort((x, y) => x.startHour - y.startHour);
+                // Ưu tiên phiếu Boom (cần xử lý), rồi ca đang đá, rồi ca sắp tới sớm nhất.
+                const currentBk =
+                  pitchBks.find((b) => b.status === 'boom') ??
+                  pitchBks.find((b) => b.status === 'checked-in') ??
+                  pitchBks[0];
+                const underMaintenance = pitch.lightingStatus === 'Bảo trì';
 
                 return (
                   <div
@@ -202,7 +228,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       {currentBk ? (
                         renderBookingStatusIndicator(currentBk.status)
                       ) : (
-                        <span className="status-indicator status-neutral">Sân trống</span>
+                        <span className="status-indicator status-neutral">
+                          {underMaintenance ? 'Bảo trì' : 'Sân trống'}
+                        </span>
                       )}
                     </div>
 
@@ -216,7 +244,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </div>
                     ) : (
                       <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                        Sẵn sàng nhận khách khung 17:30 – 22:00
+                        {underMaintenance
+                          ? 'Đang bảo trì – không nhận đặt'
+                          : 'Sẵn sàng nhận khách khung 17:30 – 22:00'}
                       </div>
                     )}
 
@@ -238,6 +268,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           type="button"
                           className="btn btn-ghost btn-sm"
                           style={{ height: 26, padding: '0 8px' }}
+                          disabled={underMaintenance}
                           onClick={() => onOpenNewBooking(pitch.id, 20.5)}
                         >
                           + Đặt giờ
@@ -286,31 +317,45 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <h2 className="sbl-panel-title">Cảnh Báo Nóng Trong Ca</h2>
             </div>
             <div className="sbl-panel-body flex flex-col gap-3 text-xs">
-              <div
-                className="p-3 rounded border"
-                style={{ backgroundColor: 'var(--status-danger-bg)', borderColor: 'var(--status-danger-border)' }}
-              >
-                <div className="font-bold flex items-center justify-between" style={{ color: 'var(--status-danger-text)' }}>
-                  <span>Báo Boom: Sân 03 (17:30 – 19:00)</span>
-                  <span className="font-mono-tech">SBL-24107</span>
+              {boomBookings.map((bk) => (
+                <div
+                  key={bk.id}
+                  className="p-3 rounded border"
+                  style={{ backgroundColor: 'var(--status-danger-bg)', borderColor: 'var(--status-danger-border)' }}
+                >
+                  <div className="font-bold flex items-center justify-between" style={{ color: 'var(--status-danger-text)' }}>
+                    <span>
+                      Báo Boom: {bk.pitchId} ({formatHourLabel(bk.startHour)} – {formatHourLabel(bk.startHour + bk.durationHours)})
+                    </span>
+                    <span className="font-mono-tech">{bk.id}</span>
+                  </div>
+                  <p className="mt-1" style={{ color: 'var(--text-primary)' }}>
+                    Đội {bk.teamName} đã bị báo Boom. Khuyến nghị mở sân giao hữu hoặc ghép kèo.
+                  </p>
                 </div>
-                <p className="mt-1" style={{ color: 'var(--text-primary)' }}>
-                  Đội FC Tự Do Quận 3 quá 25 phút không liên lạc được. Khuyến nghị mở sân giao hữu hoặc ghép kèo.
-                </p>
-              </div>
+              ))}
 
-              <div
-                className="p-3 rounded border"
-                style={{ backgroundColor: 'var(--status-warning-bg)', borderColor: 'var(--status-warning-border)' }}
-              >
-                <div className="font-bold flex items-center justify-between" style={{ color: 'var(--status-warning-text)' }}>
-                  <span>Sự cố chiếu sáng: Sân 05</span>
-                  <span className="font-mono-tech">SC-2026-089</span>
+              {openIncidents.map((inc) => (
+                <div
+                  key={inc.id}
+                  className="p-3 rounded border"
+                  style={{ backgroundColor: 'var(--status-warning-bg)', borderColor: 'var(--status-warning-border)' }}
+                >
+                  <div className="font-bold flex items-center justify-between" style={{ color: 'var(--status-warning-text)' }}>
+                    <span>
+                      Sự cố {inc.category.toLowerCase()}: {inc.pitchId}
+                    </span>
+                    <span className="font-mono-tech">{inc.code}</span>
+                  </div>
+                  <p className="mt-1" style={{ color: 'var(--text-primary)' }}>
+                    {inc.equipmentName} – {inc.description}
+                  </p>
                 </div>
-                <p className="mt-1" style={{ color: 'var(--text-primary)' }}>
-                  Cụm đèn pha LED 400W góc khán đài B chập chờn driver – Kỹ thuật Trần Hữu Hậu đang xử lý.
-                </p>
-              </div>
+              ))}
+
+              {boomBookings.length === 0 && openIncidents.length === 0 && (
+                <p style={{ color: 'var(--text-muted)' }}>Hiện không có cảnh báo nào trong ca.</p>
+              )}
             </div>
           </div>
         </div>
@@ -368,9 +413,9 @@ export const CustomersView: React.FC<CustomersViewProps> = ({ customers, onAddCu
       phone: phone.trim(),
       tier,
       preferredPitch,
-      totalBookings: 1,
+      totalBookings: 0,
       boomCount: 0,
-      totalSpent: 540000,
+      totalSpent: 0,
       lastVisit: '17/10/2026',
       notes: notes.trim() || 'Khách hàng mới đăng ký tại quầy.',
     });

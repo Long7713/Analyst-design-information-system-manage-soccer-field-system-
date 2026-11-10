@@ -121,7 +121,7 @@ export const DEFAULT_SIDEBAR_CONFIG: SidebarConfig = {
     },
     {
       id: 'dich-vu-kho',
-      label: 'DỊCH VỤ & CẬT CHẤT',
+      label: 'DỊCH VỤ & VẬT CHẤT',
       items: [
         {
           id: 'dich-vu',

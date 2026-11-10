@@ -16,6 +16,10 @@ import {
   hasBookingConflict,
   formatHourLabel,
   formatVND,
+  clampStartHour,
+  calculatePitchPrice,
+  START_HOUR_OPTIONS,
+  OPERATING_END_HOUR,
 } from './utils/sanbonglonLogic';
 import {
   PITCH_LIST,
@@ -58,6 +62,10 @@ interface ToastItem {
   message: string;
 }
 
+// ID duy nhất kể cả khi nhiều bản ghi được tạo trong cùng một mili-giây.
+let idSeq = 0;
+const genId = (prefix: string) => `${prefix}-${Date.now()}-${++idSeq}`;
+
 export default function App() {
   const [sidebarConfig, setSidebarConfig] = useState<SidebarConfig>(DEFAULT_SIDEBAR_CONFIG);
   const [activeNavId, setActiveNavId] = useState<NavItemId>('tong-quan');
@@ -85,6 +93,12 @@ export default function App() {
   const [nbDeposit, setNbDeposit] = useState<number>(200000);
   const [nbNotes, setNbNotes] = useState<string>('');
   const [nbError, setNbError] = useState<string>('');
+
+  // Chỉ các phiếu của ngày đang chọn được đưa vào lịch, thống kê, Dashboard, trang công khai.
+  const bookingsForDate = useMemo(
+    () => bookings.filter((b) => b.date === selectedDate),
+    [bookings, selectedDate]
+  );
 
   // Toast Notifications
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -130,7 +144,7 @@ export default function App() {
     targetRef: string
   ) => {
     const entry: AuditLogEntry = {
-      id: `AUD-${Date.now()}`,
+      id: genId('AUD'),
       traceId: `TRC-${Math.floor(1000 + Math.random() * 9000)}X`,
       timestamp: '17/10/2026 – Vừa xong',
       actor: sidebarConfig.operator.name,
@@ -152,22 +166,37 @@ export default function App() {
     const target = bookings.find((b) => b.id === bookingId);
     if (!target) return;
 
-    if (action === 'doi-gio' && payload?.newStartHour !== undefined) {
+    const updated = applyBookingAction(target, action, payload);
+
+    if (action === 'them-gio' && updated.durationHours === target.durationHours) {
+      showToast(`Không thể thêm giờ: ${target.pitchId} đã kín đến ${OPERATING_END_HOUR}:00.`);
+      return;
+    }
+
+    // Đổi giờ, thêm giờ, hoặc khôi phục phiếu Boom/Hủy đều chiếm lại khung giờ -> phải kiểm tra trùng.
+    const revivesInactive =
+      action === 'nhan-san' && (target.status === 'boom' || target.status === 'cancelled');
+    if (action === 'doi-gio' || action === 'them-gio' || revivesInactive) {
       const conflict = hasBookingConflict(bookings, {
         id: target.id,
         pitchId: target.pitchId,
         date: target.date,
-        startHour: payload.newStartHour,
-        durationHours: target.durationHours,
+        startHour: updated.startHour,
+        durationHours: updated.durationHours,
       });
 
       if (conflict) {
-        showToast(`Khung giờ ${formatHourLabel(payload.newStartHour)} tại ${target.pitchId} đã có đội khác đặt.`);
+        showToast(
+          `Không thể ${
+            action === 'doi-gio' ? 'đổi giờ' : action === 'them-gio' ? 'thêm giờ' : 'nhận sân'
+          }: khung ${formatHourLabel(updated.startHour)} – ${formatHourLabel(
+            updated.startHour + updated.durationHours
+          )} tại ${target.pitchId} đã có đội khác đặt.`
+        );
         return;
       }
     }
 
-    const updated = applyBookingAction(target, action, payload);
     setBookings((prev) => prev.map((b) => (b.id === bookingId ? updated : b)));
 
     const actionLabels: Record<typeof action, string> = {
@@ -186,13 +215,39 @@ export default function App() {
     showToast(actionLabels[action]);
   };
 
-  // Add POS Item directly to a Booking
-  const handleAddPosToBooking = (bookingId: string, product: PosProduct, qty: number) => {
+  // Ghi một dòng thẻ kho cho mỗi lần xuất bán POS.
+  const logStockMovement = (product: PosProduct, qty: number, note: string) => {
+    const mov: StockMovementRecord = {
+      id: genId('MOV'),
+      timestamp: '17/10/2026 – Vừa xong',
+      type: 'Xuất bán POS',
+      productName: product.name,
+      quantityChange: -qty,
+      staffName: sidebarConfig.operator.name,
+      note,
+    };
+    setStockMovements((prev) => [mov, ...prev]);
+  };
+
+  const getStock = (productId: string) => posProducts.find((p) => p.id === productId)?.stock ?? 0;
+
+  // Add POS Item directly to a Booking. `silent` dùng khi đơn nhiều món đã tự ghi audit/toast tổng.
+  const handleAddPosToBooking = (
+    bookingId: string,
+    product: PosProduct,
+    qty: number,
+    silent = false
+  ): boolean => {
+    if (getStock(product.id) < qty) {
+      showToast(`Không đủ tồn kho ${product.name} (còn ${getStock(product.id)}).`);
+      return false;
+    }
+
     setBookings((prev) =>
       prev.map((b) => {
         if (b.id !== bookingId) return b;
         const existingIdx = b.posItems.findIndex((i) => i.productId === product.id);
-        let nextItems = [...b.posItems];
+        const nextItems = [...b.posItems];
         if (existingIdx >= 0) {
           nextItems[existingIdx] = {
             ...nextItems[existingIdx],
@@ -211,15 +266,19 @@ export default function App() {
     );
 
     setPosProducts((prev) =>
-      prev.map((p) => (p.id === product.id ? { ...p, stock: Math.max(0, p.stock - qty) } : p))
+      prev.map((p) => (p.id === product.id ? { ...p, stock: p.stock - qty } : p))
     );
+    logStockMovement(product, qty, `Gắn đơn ${bookingId}`);
 
-    recordAudit(
-      'Thanh toán & POS',
-      `Thêm ${qty} ${product.unit} ${product.name} vào phiếu ${bookingId}`,
-      bookingId
-    );
-    showToast(`Đã thêm ${qty} ${product.name} vào phiếu ${bookingId}.`);
+    if (!silent) {
+      recordAudit(
+        'Thanh toán & POS',
+        `Thêm ${qty} ${product.unit} ${product.name} vào phiếu ${bookingId}`,
+        bookingId
+      );
+      showToast(`Đã thêm ${qty} ${product.name} vào phiếu ${bookingId}.`);
+    }
+    return true;
   };
 
   // Complete POS Counter Order
@@ -228,34 +287,47 @@ export default function App() {
     paymentMethod: 'Tiền mặt' | 'Chuyển khoản QR';
     items: { product: PosProduct; qty: number }[];
   }) => {
-    const orderTotal = payload.items.reduce((s, i) => s + i.product.price * i.qty, 0);
+    if (payload.items.length === 0) return;
 
-    if (payload.targetBookingId !== 'walk-in') {
-      payload.items.forEach((item) => {
-        handleAddPosToBooking(payload.targetBookingId, item.product, item.qty);
-      });
-    } else {
-      // Deduct inventory
-      setPosProducts((prev) =>
-        prev.map((p) => {
-          const found = payload.items.find((i) => i.product.id === p.id);
-          return found ? { ...p, stock: Math.max(0, p.stock - found.qty) } : p;
-        })
-      );
+    const short = payload.items.find((i) => getStock(i.product.id) < i.qty);
+    if (short) {
+      showToast(`Không đủ tồn kho ${short.product.name} (còn ${getStock(short.product.id)}).`);
+      return;
     }
 
+    const orderTotal = payload.items.reduce((s, i) => s + i.product.price * i.qty, 0);
+
+    // Đơn gắn vào phiếu sân: chỉ cộng vào hóa đơn của phiếu, tiền thu ở bước tất toán sân.
+    // Không tạo giao dịch doanh thu "Đã quyết toán" ở đây để tránh tính tiền hai lần.
+    if (payload.targetBookingId !== 'walk-in') {
+      payload.items.forEach((item) => {
+        handleAddPosToBooking(payload.targetBookingId, item.product, item.qty, true);
+      });
+      recordAudit(
+        'Thanh toán & POS',
+        `Ghi đơn POS ${formatVND(orderTotal)} vào phiếu ${payload.targetBookingId}`,
+        payload.targetBookingId
+      );
+      showToast(
+        `Đã ghi đơn POS (${formatVND(orderTotal)}) vào phiếu ${payload.targetBookingId}, thu khi tất toán sân.`
+      );
+      return;
+    }
+
+    setPosProducts((prev) =>
+      prev.map((p) => {
+        const found = payload.items.find((i) => i.product.id === p.id);
+        return found ? { ...p, stock: p.stock - found.qty } : p;
+      })
+    );
+    payload.items.forEach((item) => logStockMovement(item.product, item.qty, 'Bán lẻ tại quầy POS'));
+
     const newTx: RevenueTransaction = {
-      id: `FIN-${Date.now()}`,
+      id: genId('FIN'),
       code: `PT-261017-${revenueTx.length + 10}`,
       timestamp: '17/10/2026 – Vừa xong',
-      pitchOrCounter:
-        payload.targetBookingId === 'walk-in'
-          ? 'Quầy POS Trung tâm'
-          : `Phiếu ${payload.targetBookingId}`,
-      customerOrTeam:
-        payload.targetBookingId === 'walk-in'
-          ? 'Khách mua lẻ tại quầy'
-          : `Gán vào phiếu ${payload.targetBookingId}`,
+      pitchOrCounter: 'Quầy POS Trung tâm',
+      customerOrTeam: 'Khách mua lẻ tại quầy',
       category: 'Bán hàng POS',
       paymentMethod: payload.paymentMethod,
       amount: orderTotal,
@@ -275,8 +347,8 @@ export default function App() {
   // Open New Booking Modal
   const openNewBookingModal = (prefillPitchId = 'Sân 01', prefillHour = 19.0) => {
     setNbPitchId(prefillPitchId);
-    setNbStartHour(prefillHour);
     setNbDuration(1.5);
+    setNbStartHour(clampStartHour(prefillHour, 1.5));
     setNbError('');
     setNewBookingOpen(true);
   };
@@ -286,6 +358,23 @@ export default function App() {
     e.preventDefault();
     if (!nbTeamName.trim() || !nbCustomerName.trim() || !nbPhone.trim()) {
       setNbError('Vui lòng nhập Tên đội, Họ tên người đặt và Số điện thoại.');
+      return;
+    }
+
+    const pitchObj = PITCH_LIST.find((p) => p.id === nbPitchId) || PITCH_LIST[0];
+
+    if (pitchObj.lightingStatus === 'Bảo trì') {
+      setNbError(`${pitchObj.name} đang bảo trì, không nhận đặt. Vui lòng chọn sân khác.`);
+      return;
+    }
+
+    if (nbStartHour + nbDuration > OPERATING_END_HOUR) {
+      setNbError(`Ca đá phải kết thúc trước ${OPERATING_END_HOUR}:00. Vui lòng chọn giờ bắt đầu sớm hơn.`);
+      return;
+    }
+
+    if (!Number.isFinite(nbDeposit) || nbDeposit < 0) {
+      setNbError('Tiền cọc không được âm.');
       return;
     }
 
@@ -305,14 +394,7 @@ export default function App() {
       return;
     }
 
-    const pitchObj = PITCH_LIST.find((p) => p.id === nbPitchId) || PITCH_LIST[0];
-    const hourlyRate =
-      nbStartHour >= 16 && nbStartHour <= 21.5
-        ? pitchObj.baseRatePrime
-        : nbStartHour < 16
-        ? pitchObj.baseRateMorning
-        : pitchObj.baseRateLate;
-    const calculatedPrice = Math.round(hourlyRate * nbDuration);
+    const calculatedPrice = calculatePitchPrice(pitchObj, nbStartHour, nbDuration);
 
     const newBooking: PitchBooking = {
       id: `SBL-${24119 + bookings.length}`,
@@ -325,8 +407,8 @@ export default function App() {
       startHour: nbStartHour,
       durationHours: nbDuration,
       pitchPrice: calculatedPrice,
-      depositPaid: Number(nbDeposit) || 0,
-      status: Number(nbDeposit) > 0 ? 'confirmed' : 'pending',
+      depositPaid: nbDeposit,
+      status: nbDeposit > 0 ? 'confirmed' : 'pending',
       notes: nbNotes.trim() || undefined,
       posItems: [],
     };
@@ -362,7 +444,7 @@ export default function App() {
   if (activeNavId === 'lich-san-cong-khai') {
     return (
       <PublicWebsiteView
-        bookings={bookings}
+        bookings={bookingsForDate}
         onSwitchToInternal={(targetId) => setActiveNavId(targetId)}
       />
     );
@@ -411,7 +493,7 @@ export default function App() {
         <main className="sbl-main-content">
           {activeNavId === 'tong-quan' && (
             <DashboardView
-              bookings={bookings}
+              bookings={bookingsForDate}
               incidents={incidents}
               products={posProducts}
               onNavigate={(id) => setActiveNavId(id)}
@@ -423,7 +505,7 @@ export default function App() {
           {(activeNavId === 'lich-san' || activeNavId === 'dat-san') && (
             <ScheduleAndBookingView
               mode={activeNavId === 'lich-san' ? 'schedule' : 'bookings'}
-              bookings={bookings}
+              bookings={bookingsForDate}
               posProducts={posProducts}
               selectedDate={selectedDate}
               onChangeDate={setSelectedDate}
@@ -439,7 +521,7 @@ export default function App() {
               onAddCustomer={(newCust) => {
                 const created: CustomerRecord = {
                   ...newCust,
-                  id: `KH-00${customers.length + 1}`,
+                  id: `KH-${String(customers.length + 1).padStart(3, '0')}`,
                 };
                 setCustomers((prev) => [created, ...prev]);
                 showToast(`Đã thêm khách hàng ${created.teamName}.`);
@@ -461,8 +543,10 @@ export default function App() {
               onCreateIncident={(inc) => {
                 const created: EquipmentIncident = {
                   ...inc,
-                  id: `INC-${Date.now()}`,
-                  code: `SC-2026-09${incidents.length + 1}`,
+                  id: genId('INC'),
+                  code: `SC-2026-${String(
+                    Math.max(0, ...incidents.map((i) => Number(i.code.split('-').pop()) || 0)) + 1
+                  ).padStart(3, '0')}`,
                   reportedAt: '17/10/2026 – Vừa xong',
                 };
                 setIncidents((prev) => [created, ...prev]);
@@ -593,13 +677,11 @@ export default function App() {
                     value={nbStartHour}
                     onChange={(e) => setNbStartHour(Number(e.target.value))}
                   >
-                    {[7, 7.5, 8, 8.5, 9, 9.5, 10, 14, 15, 16, 16.5, 17, 17.5, 18, 18.5, 19, 19.5, 20, 20.5, 21, 21.5, 22].map(
-                      (h) => (
-                        <option key={h} value={h}>
-                          {formatHourLabel(h)}
-                        </option>
-                      )
-                    )}
+                    {START_HOUR_OPTIONS.filter((h) => h + nbDuration <= OPERATING_END_HOUR).map((h) => (
+                      <option key={h} value={h}>
+                        {formatHourLabel(h)}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -611,7 +693,11 @@ export default function App() {
                     id="nbDurationSelect"
                     className="form-select font-mono-tech"
                     value={nbDuration}
-                    onChange={(e) => setNbDuration(Number(e.target.value))}
+                    onChange={(e) => {
+                      const d = Number(e.target.value);
+                      setNbDuration(d);
+                      setNbStartHour((h) => clampStartHour(h, d));
+                    }}
                   >
                     <option value={1.0}>1.0 giờ (60p)</option>
                     <option value={1.5}>1.5 giờ (90p)</option>
@@ -676,7 +762,7 @@ export default function App() {
                     step={50000}
                     className="form-input font-mono-tech"
                     value={nbDeposit}
-                    onChange={(e) => setNbDeposit(Number(e.target.value))}
+                    onChange={(e) => setNbDeposit(Math.max(0, Number(e.target.value) || 0))}
                   />
                 </div>
               </div>

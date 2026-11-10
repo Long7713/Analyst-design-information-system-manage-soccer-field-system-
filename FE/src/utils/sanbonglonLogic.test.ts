@@ -7,6 +7,10 @@ import {
   hasBookingConflict,
   applyBookingAction,
   classifyCustomerRisk,
+  START_HOUR_OPTIONS,
+  clampStartHour,
+  calculatePitchPrice,
+  occupancyPercent,
   type PitchBooking,
 } from './sanbonglonLogic.ts';
 
@@ -119,4 +123,52 @@ test('classifyCustomerRisk identifies high boom risk accurately', () => {
   assert.equal(classifyCustomerRisk(12, 0).level, 'an-toan');
   assert.equal(classifyCustomerRisk(8, 1).level, 'canh-bao');
   assert.equal(classifyCustomerRisk(5, 2).level, 'rui-ro-cao');
+});
+
+const mk = (o: Partial<PitchBooking>): PitchBooking => ({
+  id: 'T1', pitchId: 'Sân 01', pitchType: '5 người', customerName: 'a', teamName: 't', phone: '1',
+  date: '2026-10-17', startHour: 17.5, durationHours: 1.5, pitchPrice: 0, depositPaid: 0,
+  status: 'confirmed', posItems: [], ...o,
+});
+
+test('START_HOUR_OPTIONS covers every timeline hour (11h, 12h, 13h, 23h included)', () => {
+  for (const h of [7, 11, 12, 13, 23]) assert.ok(START_HOUR_OPTIONS.includes(h), `missing ${h}`);
+});
+
+test('clampStartHour keeps the match inside opening hours', () => {
+  assert.equal(clampStartHour(23, 1.5), 22.5);
+  assert.equal(clampStartHour(12, 1.5), 12);
+  assert.equal(clampStartHour(5, 1), 7);
+});
+
+test('extending a booking into the next one is detected as a conflict', () => {
+  const a = mk({ id: 'A', startHour: 17.5, durationHours: 1.5 });
+  const b = mk({ id: 'B', startHour: 19.5 });
+  let extended = applyBookingAction(a, 'them-gio', { extraHours: 0.5 });
+  assert.equal(hasBookingConflict([b], { ...extended }), false); // 17:30-19:30 vừa chạm, chưa đè
+  extended = applyBookingAction(extended, 'them-gio', { extraHours: 0.5 });
+  assert.equal(hasBookingConflict([b], { ...extended }), true); // 17:30-20:00 đè lên B
+});
+
+test('reviving a boom booking is a conflict once the slot was rebooked', () => {
+  const boom = mk({ id: 'BOOM', status: 'boom' });
+  const rebooked = mk({ id: 'NEW' });
+  const revived = applyBookingAction(boom, 'nhan-san');
+  assert.equal(hasBookingConflict([rebooked], { ...revived }), true);
+});
+
+test('calculatePitchPrice charges each half-hour in its own price band', () => {
+  const rates = { baseRateMorning: 200000, baseRatePrime: 340000, baseRateLate: 260000 };
+  assert.equal(calculatePitchPrice(rates, 15, 2), 200000 * 1 + 340000 * 1); // 15-16 sáng, 16-17 vàng
+  assert.equal(calculatePitchPrice(rates, 17.5, 1.5), 510000);
+  assert.equal(calculatePitchPrice(rates, 21, 1.5), 340000 * 0.5 + 260000 * 1);
+});
+
+test('occupancyPercent ignores cancelled and boom bookings', () => {
+  const list = [
+    mk({ id: '1', startHour: 17, durationHours: 2 }),
+    mk({ id: '2', status: 'boom', startHour: 17, durationHours: 2 }),
+    mk({ id: '3', status: 'cancelled', startHour: 17, durationHours: 2 }),
+  ];
+  assert.equal(occupancyPercent(list, 17, 21, 1), 50);
 });

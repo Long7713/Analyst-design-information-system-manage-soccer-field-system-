@@ -52,8 +52,10 @@ export const PosCounterView: React.FC<PosCounterViewProps> = ({
     setCart((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
+        if (existing.qty >= product.stock) return prev; // không vượt tồn kho
         return prev.map((i) => (i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i));
       }
+      if (product.stock < 1) return prev;
       return [...prev, { product, qty: 1 }];
     });
   };
@@ -61,7 +63,11 @@ export const PosCounterView: React.FC<PosCounterViewProps> = ({
   const updateCartQty = (productId: string, delta: number) => {
     setCart((prev) =>
       prev
-        .map((i) => (i.product.id === productId ? { ...i, qty: i.qty + delta } : i))
+        .map((i) =>
+          i.product.id === productId
+            ? { ...i, qty: Math.min(i.qty + delta, i.product.stock) }
+            : i
+        )
         .filter((i) => i.qty > 0)
     );
   };

@@ -21,6 +21,7 @@ import {
   calculateBookingFinancials,
   OPERATING_START_HOUR,
   OPERATING_END_HOUR,
+  START_HOUR_OPTIONS,
 } from '../utils/sanbonglonLogic';
 import { PITCH_LIST, type PosProduct } from '../data/demoData';
 
@@ -102,6 +103,12 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
   const [quickPosProductId, setQuickPosProductId] = useState<string>(posProducts[0]?.id || 'POS-01');
   const [quickPosQty, setQuickPosQty] = useState<number>(6);
 
+  const weekdayLabel = useMemo(() => {
+    const names = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    const d = new Date(`${selectedDate}T00:00:00`);
+    return Number.isNaN(d.getTime()) ? '' : names[d.getDay()];
+  }, [selectedDate]);
+
   const selectedBooking = useMemo(
     () => bookings.find((b) => b.id === selectedBookingId) || null,
     [bookings, selectedBookingId]
@@ -153,7 +160,7 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
           </h1>
           <p className="sbl-page-subtitle">
             Cụm 12 sân tiêu chuẩn (Sân 01 đến 08: 5 người | Sân 09 đến 12: 7 người). Ngày trực:{' '}
-            <strong className="font-mono-tech">{selectedDate}</strong> (Thứ 7 – Cao điểm cuối tuần)
+            <strong className="font-mono-tech">{selectedDate}</strong> ({weekdayLabel})
           </p>
         </div>
         <div className="sbl-page-actions">
@@ -622,13 +629,13 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                       value={rescheduleHour ?? selectedBooking.startHour}
                       onChange={(e) => setRescheduleHour(Number(e.target.value))}
                     >
-                      {[7, 7.5, 8, 8.5, 9, 14, 15, 16, 16.5, 17, 17.5, 18, 18.5, 19, 19.5, 20, 20.5, 21, 21.5, 22].map(
-                        (h) => (
-                          <option key={h} value={h}>
-                            {formatHourLabel(h)}
-                          </option>
-                        )
-                      )}
+                      {START_HOUR_OPTIONS.filter(
+                        (h) => h + selectedBooking.durationHours <= OPERATING_END_HOUR
+                      ).map((h) => (
+                        <option key={h} value={h}>
+                          {formatHourLabel(h)}
+                        </option>
+                      ))}
                     </select>
                     <button
                       type="button"
