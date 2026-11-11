@@ -161,15 +161,22 @@ export default function App() {
   const handleBookingAction = (
     bookingId: string,
     action: 'nhan-san' | 'them-gio' | 'doi-gio' | 'bao-boom' | 'huy-san',
-    payload?: { newStartHour?: number; extraHours?: number; extraRatePerHour?: number }
+    payload?: { newStartHour?: number; extraHours?: number }
   ) => {
     const target = bookings.find((b) => b.id === bookingId);
     if (!target) return;
 
     const updated = applyBookingAction(target, action, payload);
 
+    if (action === 'them-gio' && target.status !== 'checked-in') {
+      showToast('Chỉ thêm giờ được cho phiếu đang đá (đã nhận sân).');
+      return;
+    }
+
     if (action === 'them-gio' && updated.durationHours === target.durationHours) {
-      showToast(`Không thể thêm giờ: ${target.pitchId} đã kín đến ${OPERATING_END_HOUR}:00.`);
+      showToast(
+        `Không thể thêm giờ: số phút không hợp lệ hoặc ${target.pitchId} đã kín đến ${OPERATING_END_HOUR}:00.`
+      );
       return;
     }
 

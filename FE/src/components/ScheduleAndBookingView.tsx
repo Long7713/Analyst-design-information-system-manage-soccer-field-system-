@@ -22,6 +22,8 @@ import {
   OPERATING_START_HOUR,
   OPERATING_END_HOUR,
   START_HOUR_OPTIONS,
+  EXTRA_SLOT_HOURS,
+  EXTRA_PRICE_PER_SLOT,
 } from '../utils/sanbonglonLogic';
 import { PITCH_LIST, type PosProduct } from '../data/demoData';
 
@@ -34,7 +36,7 @@ interface ScheduleAndBookingViewProps {
   onBookingAction: (
     bookingId: string,
     action: 'nhan-san' | 'them-gio' | 'doi-gio' | 'bao-boom' | 'huy-san',
-    payload?: { newStartHour?: number; extraHours?: number; extraRatePerHour?: number }
+    payload?: { newStartHour?: number; extraHours?: number }
   ) => void;
   onAddPosToBooking: (bookingId: string, product: PosProduct, qty: number) => void;
   onOpenNewBookingModal: (prefillPitchId?: string, prefillHour?: number) => void;
@@ -585,15 +587,15 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
+                    disabled={selectedBooking.status !== 'checked-in'}
                     onClick={() =>
                       onBookingAction(selectedBooking.id, 'them-gio', {
-                        extraHours: 0.5,
-                        extraRatePerHour: selectedBooking.pitchType === '7 người' ? 580000 : 360000,
+                        extraHours: EXTRA_SLOT_HOURS,
                       })
                     }
                   >
                     <Clock size={15} />
-                    <span>Thêm giờ (+30p)</span>
+                    <span>Thêm giờ (+30p · {formatVND(EXTRA_PRICE_PER_SLOT)})</span>
                   </button>
                   <button
                     type="button"

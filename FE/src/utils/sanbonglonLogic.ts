@@ -33,6 +33,13 @@ export const OPERATING_START_HOUR = 7;
 export const OPERATING_END_HOUR = 24;
 export const TOTAL_OPERATING_HOURS = OPERATING_END_HOUR - OPERATING_START_HOUR; // 17 hours
 
+/**
+ * Chính sách thêm giờ (báo cáo BR17): mỗi lượt là 30 phút, giá 50.000 đ/30 phút.
+ * Chỉ nhận bội số của 30 phút vì quy tắc phần lẻ chưa chốt, không tự làm tròn để thu.
+ */
+export const EXTRA_SLOT_HOURS = 0.5;
+export const EXTRA_PRICE_PER_SLOT = 50000;
+
 /** Mọi mốc giờ bắt đầu hợp lệ trên timeline: 07:00, 07:30, ... 23:30. */
 export const START_HOUR_OPTIONS: number[] = Array.from(
   { length: TOTAL_OPERATING_HOURS * 2 },
@@ -168,21 +175,25 @@ export function hasBookingConflict(
 export function applyBookingAction(
   booking: PitchBooking,
   action: 'nhan-san' | 'them-gio' | 'doi-gio' | 'bao-boom' | 'huy-san',
-  payload?: { newStartHour?: number; extraHours?: number; extraRatePerHour?: number }
+  payload?: { newStartHour?: number; extraHours?: number }
 ): PitchBooking {
   switch (action) {
     case 'nhan-san':
       return { ...booking, status: 'checked-in' };
 
     case 'them-gio': {
-      const addHours = payload?.extraHours ?? 0.5;
-      const rate = payload?.extraRatePerHour ?? 300000;
+      const addHours = payload?.extraHours ?? EXTRA_SLOT_HOURS;
+      // Thêm giờ tối thiểu 0,5h và phải là bội số của 0,5h; ngoài ra giữ nguyên phiếu.
+      if (addHours < EXTRA_SLOT_HOURS || (addHours / EXTRA_SLOT_HOURS) % 1 !== 0) {
+        return booking;
+      }
       const nextDuration = Math.min(OPERATING_END_HOUR - booking.startHour, booking.durationHours + addHours);
       const actualAdded = Math.max(0, nextDuration - booking.durationHours);
       return {
         ...booking,
         durationHours: nextDuration,
-        pitchPrice: booking.pitchPrice + Math.round(actualAdded * rate),
+        pitchPrice:
+          booking.pitchPrice + Math.round((actualAdded / EXTRA_SLOT_HOURS) * EXTRA_PRICE_PER_SLOT),
       };
     }
 

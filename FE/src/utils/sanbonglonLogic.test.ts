@@ -8,6 +8,7 @@ import {
   applyBookingAction,
   classifyCustomerRisk,
   START_HOUR_OPTIONS,
+  EXTRA_PRICE_PER_SLOT,
   clampStartHour,
   calculatePitchPrice,
   occupancyPercent,
@@ -105,9 +106,9 @@ test('applyBookingAction handles Nhận, Thêm giờ, Đổi giờ, Báo boom, a
   const checkedIn = applyBookingAction(base, 'nhan-san');
   assert.equal(checkedIn.status, 'checked-in');
 
-  const extended = applyBookingAction(base, 'them-gio', { extraHours: 0.5, extraRatePerHour: 300000 });
+  const extended = applyBookingAction(base, 'them-gio', { extraHours: 0.5 });
   assert.equal(extended.durationHours, 2.0);
-  assert.equal(extended.pitchPrice, 600000);
+  assert.equal(extended.pitchPrice, 500000); // 450.000 + 50.000 cho 30 phút thêm (BR17)
 
   const rescheduled = applyBookingAction(base, 'doi-gio', { newStartHour: 19.5 });
   assert.equal(rescheduled.startHour, 19.5);
@@ -171,4 +172,32 @@ test('occupancyPercent ignores cancelled and boom bookings', () => {
     mk({ id: '3', status: 'cancelled', startHour: 17, durationHours: 2 }),
   ];
   assert.equal(occupancyPercent(list, 17, 21, 1), 50);
+});
+
+test('them-gio charges 50.000 per 30 minutes (BR17), regardless of pitch or time band', () => {
+  const b = mk({ pitchPrice: 540000, durationHours: 1.5, startHour: 17.5 });
+  assert.equal(EXTRA_PRICE_PER_SLOT, 50000);
+  const one = applyBookingAction(b, 'them-gio', { extraHours: 0.5 });
+  assert.equal(one.durationHours, 2);
+  assert.equal(one.pitchPrice, 590000);
+  const two = applyBookingAction(b, 'them-gio', { extraHours: 1 });
+  assert.equal(two.durationHours, 2.5);
+  assert.equal(two.pitchPrice, 640000);
+  assert.equal(applyBookingAction(b, 'them-gio').pitchPrice, 590000); // mặc định 1 lượt
+});
+
+test('them-gio rejects amounts under 30 minutes or not a multiple of 30 minutes', () => {
+  const b = mk({ pitchPrice: 540000 });
+  for (const extraHours of [0.25, 0.4, 0.75, 1.2, 0]) {
+    const r = applyBookingAction(b, 'them-gio', { extraHours });
+    assert.equal(r.durationHours, b.durationHours, `extraHours=${extraHours}`);
+    assert.equal(r.pitchPrice, b.pitchPrice, `extraHours=${extraHours}`);
+  }
+});
+
+test('them-gio never charges for time past closing', () => {
+  const b = mk({ startHour: 22.5, durationHours: 1, pitchPrice: 100000 }); // đến 23:30
+  const r = applyBookingAction(b, 'them-gio', { extraHours: 1 }); // chỉ còn 30 phút
+  assert.equal(r.durationHours, 1.5);
+  assert.equal(r.pitchPrice, 150000);
 });
