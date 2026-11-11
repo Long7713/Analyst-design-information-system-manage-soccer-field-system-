@@ -22,7 +22,8 @@ export interface PitchBooking {
   date: string;
   startHour: number; // e.g., 17.5 for 17:30, range 7..24
   durationHours: number; // e.g., 1.5
-  pitchPrice: number;
+  pitchPrice: number; // Tiền sân ban đầu T (không đổi khi thêm giờ)
+  overtimeAmount?: number; // Phụ phí thêm giờ, tách khỏi T (báo cáo: overtime_amount)
   depositPaid: number;
   status: BookingStatus;
   notes?: string;
@@ -128,19 +129,25 @@ export function calculateTimelinePosition(startHour: number, durationHours: numb
   };
 }
 
-export function calculateBookingFinancials(booking: Pick<PitchBooking, 'pitchPrice' | 'depositPaid' | 'posItems'>): {
+export function calculateBookingFinancials(
+  booking: Pick<PitchBooking, 'pitchPrice' | 'depositPaid' | 'posItems'> & { overtimeAmount?: number }
+): {
   pitchTotal: number;
+  overtimeTotal: number;
   posTotal: number;
   grandTotal: number;
   remainingBalance: number;
 } {
   const pitchTotal = Math.max(0, booking.pitchPrice);
   const posTotal = booking.posItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const grandTotal = pitchTotal + posTotal;
+  const overtimeTotal = Math.max(0, booking.overtimeAmount ?? 0);
+  // BR18: tổng phải trả = tiền sân + thêm giờ + dịch vụ.
+  const grandTotal = pitchTotal + overtimeTotal + posTotal;
   const remainingBalance = Math.max(0, grandTotal - booking.depositPaid);
 
   return {
     pitchTotal,
+    overtimeTotal,
     posTotal,
     grandTotal,
     remainingBalance,
@@ -172,11 +179,51 @@ export function hasBookingConflict(
   });
 }
 
+/** BR07: khách chỉ chọn cọc 50% hoặc 100% tiền sân T, hoặc chưa nộp (chờ cọc). Không nhập số tùy ý. */
+export type DepositMode = 'pending' | 'half' | 'full';
+
+export function depositAmountFor(pitchPrice: number, mode: DepositMode): number {
+  if (mode === 'pending') return 0;
+  return Math.round(mode === 'half' ? pitchPrice * 0.5 : pitchPrice);
+}
+
+export type BookingAction = 'nhan-san' | 'them-gio' | 'doi-gio' | 'bao-boom' | 'huy-san';
+
+/**
+ * Điều kiện trạng thái theo báo cáo (UC02, UC03, UC04, UC08 / BR10, BR11, BR17).
+ * Trả về lý do từ chối, hoặc null nếu thao tác được phép.
+ */
+export function getActionBlockReason(
+  booking: Pick<PitchBooking, 'status'>,
+  action: BookingAction
+): string | null {
+  const s = booking.status;
+  switch (action) {
+    case 'nhan-san':
+      if (s === 'confirmed') return null;
+      if (s === 'pending') return 'Đơn đang chờ cọc: cần xác nhận cọc trước khi nhận sân.';
+      if (s === 'checked-in') return 'Đơn đã nhận sân trước đó.';
+      return 'Đơn đã hủy hoặc khách không đến, không thể nhận sân.';
+    case 'them-gio':
+      return s === 'checked-in' ? null : 'Chỉ thêm giờ được cho đơn đang đá (đã nhận sân).';
+    case 'bao-boom':
+      return s === 'confirmed' ? null : 'Chỉ ghi nhận vắng mặt cho đơn đã xác nhận và chưa nhận sân.';
+    case 'huy-san':
+      return s === 'pending' || s === 'confirmed'
+        ? null
+        : 'Đơn đang đá, đã hủy hoặc khách không đến: không thể hủy.';
+    default:
+      return null;
+  }
+}
+
 export function applyBookingAction(
   booking: PitchBooking,
-  action: 'nhan-san' | 'them-gio' | 'doi-gio' | 'bao-boom' | 'huy-san',
+  action: BookingAction,
   payload?: { newStartHour?: number; extraHours?: number }
 ): PitchBooking {
+  if (getActionBlockReason(booking, action) !== null) return booking;
+
   switch (action) {
     case 'nhan-san':
       return { ...booking, status: 'checked-in' };
@@ -192,8 +239,10 @@ export function applyBookingAction(
       return {
         ...booking,
         durationHours: nextDuration,
-        pitchPrice:
-          booking.pitchPrice + Math.round((actualAdded / EXTRA_SLOT_HOURS) * EXTRA_PRICE_PER_SLOT),
+        // Phụ phí thêm giờ ghi riêng, không cộng vào tiền sân ban đầu T.
+        overtimeAmount:
+          (booking.overtimeAmount ?? 0) +
+          Math.round((actualAdded / EXTRA_SLOT_HOURS) * EXTRA_PRICE_PER_SLOT),
       };
     }
 

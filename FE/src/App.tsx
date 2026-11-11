@@ -18,6 +18,10 @@ import {
   formatVND,
   clampStartHour,
   calculatePitchPrice,
+  depositAmountFor,
+  getActionBlockReason,
+  type DepositMode,
+  type BookingAction,
   START_HOUR_OPTIONS,
   OPERATING_END_HOUR,
 } from './utils/sanbonglonLogic';
@@ -90,7 +94,7 @@ export default function App() {
   const [nbTeamName, setNbTeamName] = useState<string>('');
   const [nbCustomerName, setNbCustomerName] = useState<string>('');
   const [nbPhone, setNbPhone] = useState<string>('');
-  const [nbDeposit, setNbDeposit] = useState<number>(200000);
+  const [nbDepositMode, setNbDepositMode] = useState<DepositMode>('half');
   const [nbNotes, setNbNotes] = useState<string>('');
   const [nbError, setNbError] = useState<string>('');
 
@@ -160,18 +164,20 @@ export default function App() {
   // Booking Operational Action Handler
   const handleBookingAction = (
     bookingId: string,
-    action: 'nhan-san' | 'them-gio' | 'doi-gio' | 'bao-boom' | 'huy-san',
+    action: BookingAction,
     payload?: { newStartHour?: number; extraHours?: number }
   ) => {
     const target = bookings.find((b) => b.id === bookingId);
     if (!target) return;
 
-    const updated = applyBookingAction(target, action, payload);
-
-    if (action === 'them-gio' && target.status !== 'checked-in') {
-      showToast('Chỉ thêm giờ được cho phiếu đang đá (đã nhận sân).');
+    // Điều kiện trạng thái theo báo cáo: Nhận sân chỉ với đơn đã xác nhận, Thêm giờ chỉ với đơn đang đá...
+    const blocked = getActionBlockReason(target, action);
+    if (blocked) {
+      showToast(blocked);
       return;
     }
+
+    const updated = applyBookingAction(target, action, payload);
 
     if (action === 'them-gio' && updated.durationHours === target.durationHours) {
       showToast(
@@ -180,10 +186,8 @@ export default function App() {
       return;
     }
 
-    // Đổi giờ, thêm giờ, hoặc khôi phục phiếu Boom/Hủy đều chiếm lại khung giờ -> phải kiểm tra trùng.
-    const revivesInactive =
-      action === 'nhan-san' && (target.status === 'boom' || target.status === 'cancelled');
-    if (action === 'doi-gio' || action === 'them-gio' || revivesInactive) {
+    // Đổi giờ và thêm giờ chiếm thêm khung giờ -> phải kiểm tra trùng lịch (BR03).
+    if (action === 'doi-gio' || action === 'them-gio') {
       const conflict = hasBookingConflict(bookings, {
         id: target.id,
         pitchId: target.pitchId,
@@ -194,11 +198,11 @@ export default function App() {
 
       if (conflict) {
         showToast(
-          `Không thể ${
-            action === 'doi-gio' ? 'đổi giờ' : action === 'them-gio' ? 'thêm giờ' : 'nhận sân'
-          }: khung ${formatHourLabel(updated.startHour)} – ${formatHourLabel(
-            updated.startHour + updated.durationHours
-          )} tại ${target.pitchId} đã có đội khác đặt.`
+          `Không thể ${action === 'doi-gio' ? 'đổi giờ' : 'thêm giờ'}: khung ${formatHourLabel(
+            updated.startHour
+          )} – ${formatHourLabel(updated.startHour + updated.durationHours)} tại ${
+            target.pitchId
+          } đã có đội khác đặt.`
         );
         return;
       }
@@ -355,6 +359,7 @@ export default function App() {
   const openNewBookingModal = (prefillPitchId = 'Sân 01', prefillHour = 19.0) => {
     setNbPitchId(prefillPitchId);
     setNbDuration(1.5);
+    setNbDepositMode('half');
     setNbStartHour(clampStartHour(prefillHour, 1.5));
     setNbError('');
     setNewBookingOpen(true);
@@ -377,11 +382,6 @@ export default function App() {
 
     if (nbStartHour + nbDuration > OPERATING_END_HOUR) {
       setNbError(`Ca đá phải kết thúc trước ${OPERATING_END_HOUR}:00. Vui lòng chọn giờ bắt đầu sớm hơn.`);
-      return;
-    }
-
-    if (!Number.isFinite(nbDeposit) || nbDeposit < 0) {
-      setNbError('Tiền cọc không được âm.');
       return;
     }
 
@@ -414,8 +414,9 @@ export default function App() {
       startHour: nbStartHour,
       durationHours: nbDuration,
       pitchPrice: calculatedPrice,
-      depositPaid: nbDeposit,
-      status: nbDeposit > 0 ? 'confirmed' : 'pending',
+      // BR07: cọc chỉ là 50% hoặc 100% của T; chưa nộp thì lưu "chờ cọc".
+      depositPaid: depositAmountFor(calculatedPrice, nbDepositMode),
+      status: nbDepositMode === 'pending' ? 'pending' : 'confirmed',
       notes: nbNotes.trim() || undefined,
       posItems: [],
     };
@@ -760,17 +761,28 @@ export default function App() {
 
                 <div className="form-group">
                   <label htmlFor="nbDepositInput" className="form-label">
-                    Tiền cọc trước (VNĐ):
+                    Tiền cọc:
                   </label>
-                  <input
-                    id="nbDepositInput"
-                    type="number"
-                    min={0}
-                    step={50000}
-                    className="form-input font-mono-tech"
-                    value={nbDeposit}
-                    onChange={(e) => setNbDeposit(Math.max(0, Number(e.target.value) || 0))}
-                  />
+                  {(() => {
+                    const previewPitch = PITCH_LIST.find((p) => p.id === nbPitchId) || PITCH_LIST[0];
+                    const previewT = calculatePitchPrice(previewPitch, nbStartHour, nbDuration);
+                    return (
+                      <select
+                        id="nbDepositInput"
+                        className="form-select font-mono-tech"
+                        value={nbDepositMode}
+                        onChange={(e) => setNbDepositMode(e.target.value as DepositMode)}
+                      >
+                        <option value="half">
+                          Đã nhận cọc 50% – {formatVND(depositAmountFor(previewT, 'half'))}
+                        </option>
+                        <option value="full">
+                          Đã nhận cọc 100% – {formatVND(depositAmountFor(previewT, 'full'))}
+                        </option>
+                        <option value="pending">Chưa nộp – lưu chờ cọc (giữ chỗ 15 phút)</option>
+                      </select>
+                    );
+                  })()}
                 </div>
               </div>
 

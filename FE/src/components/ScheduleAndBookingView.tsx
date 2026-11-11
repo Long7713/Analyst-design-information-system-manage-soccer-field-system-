@@ -24,6 +24,7 @@ import {
   START_HOUR_OPTIONS,
   EXTRA_SLOT_HOURS,
   EXTRA_PRICE_PER_SLOT,
+  getActionBlockReason,
 } from '../utils/sanbonglonLogic';
 import { PITCH_LIST, type PosProduct } from '../data/demoData';
 
@@ -471,7 +472,7 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <div className="inline-flex items-center gap-1">
-                        {bk.status !== 'checked-in' && bk.status !== 'cancelled' && (
+                        {bk.status === 'confirmed' && (
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
@@ -578,7 +579,8 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                   <button
                     type="button"
                     className="btn btn-lime btn-sm"
-                    disabled={selectedBooking.status === 'checked-in'}
+                    disabled={getActionBlockReason(selectedBooking, 'nhan-san') !== null}
+                    title={getActionBlockReason(selectedBooking, 'nhan-san') ?? undefined}
                     onClick={() => onBookingAction(selectedBooking.id, 'nhan-san')}
                   >
                     <CircleCheck size={15} />
@@ -587,7 +589,8 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
-                    disabled={selectedBooking.status !== 'checked-in'}
+                    disabled={getActionBlockReason(selectedBooking, 'them-gio') !== null}
+                    title={getActionBlockReason(selectedBooking, 'them-gio') ?? undefined}
                     onClick={() =>
                       onBookingAction(selectedBooking.id, 'them-gio', {
                         extraHours: EXTRA_SLOT_HOURS,
@@ -600,6 +603,8 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                   <button
                     type="button"
                     className="btn btn-danger btn-sm"
+                    disabled={getActionBlockReason(selectedBooking, 'bao-boom') !== null}
+                    title={getActionBlockReason(selectedBooking, 'bao-boom') ?? undefined}
                     onClick={() => onBookingAction(selectedBooking.id, 'bao-boom')}
                   >
                     <TriangleAlert size={15} />
@@ -608,6 +613,8 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
+                    disabled={getActionBlockReason(selectedBooking, 'huy-san') !== null}
+                    title={getActionBlockReason(selectedBooking, 'huy-san') ?? undefined}
                     onClick={() => onBookingAction(selectedBooking.id, 'huy-san')}
                   >
                     <CircleX size={15} />
@@ -730,9 +737,15 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                     style={{ backgroundColor: 'var(--bg-sand)', borderColor: 'var(--border-strong)' }}
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span>Tiền thuê sân ({selectedBooking.durationHours} giờ):</span>
+                      <span>Tiền thuê sân ban đầu:</span>
                       <span className="font-mono-tech font-semibold">{formatVND(fin.pitchTotal)}</span>
                     </div>
+                    {fin.overtimeTotal > 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span>Phụ phí thêm giờ:</span>
+                        <span className="font-mono-tech font-semibold">{formatVND(fin.overtimeTotal)}</span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-xs">
                       <span>Dịch vụ & Nước uống (POS):</span>
                       <span className="font-mono-tech font-semibold">{formatVND(fin.posTotal)}</span>

@@ -254,7 +254,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <span className="font-mono-tech text-xs" style={{ color: 'var(--text-secondary)' }}>
                         {pitch.lightingStatus}
                       </span>
-                      {currentBk && currentBk.status !== 'checked-in' ? (
+                      {currentBk && currentBk.status === 'confirmed' ? (
                         <button
                           type="button"
                           className="btn btn-secondary btn-sm"
