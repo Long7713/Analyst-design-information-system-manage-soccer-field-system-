@@ -62,9 +62,9 @@ interface ToastItem {
   message: string;
 }
 
-// ID duy nhất kể cả khi nhiều bản ghi được tạo trong cùng một mili-giây.
+// ID duy nhất nhờ bộ đếm tăng dần (4 chữ số để không trùng ID mẫu như MOV-901).
 let idSeq = 0;
-const genId = (prefix: string) => `${prefix}-${Date.now()}-${++idSeq}`;
+const genId = (prefix: string) => `${prefix}-${String(++idSeq).padStart(4, '0')}`;
 
 export default function App() {
   const [sidebarConfig, setSidebarConfig] = useState<SidebarConfig>(DEFAULT_SIDEBAR_CONFIG);
