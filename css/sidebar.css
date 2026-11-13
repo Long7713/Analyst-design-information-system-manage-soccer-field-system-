@@ -1,0 +1,343 @@
+/**
+ * SANBONGLON – Reusable Sidebar Component Styles
+ * Supports Expanded (256px), Collapsed (72px + tooltips), and Mobile Off-Canvas Drawer
+ */
+
+.sbl-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width-expanded);
+  z-index: var(--z-sidebar);
+  background-color: var(--glass-nav-dark-bg);
+  backdrop-filter: var(--glass-nav-blur);
+  -webkit-backdrop-filter: var(--glass-nav-blur);
+  color: var(--text-on-dark);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--duration-normal) var(--ease-out),
+              transform var(--duration-normal) var(--ease-out);
+  user-select: none;
+}
+
+.sbl-sidebar.is-collapsed,
+body.sidebar-collapsed .sbl-sidebar {
+  width: var(--sidebar-width-collapsed);
+}
+
+/* Brand Header inside Sidebar */
+.sbl-sidebar-brand {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.sbl-brand-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-on-dark);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sbl-brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-lime);
+  color: var(--text-on-lime);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.sbl-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.sbl-brand-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--text-on-dark);
+  line-height: 1.1;
+}
+
+.sbl-brand-sub {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-on-dark-muted);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.sbl-sidebar.is-collapsed .sbl-brand-text,
+body.sidebar-collapsed .sbl-brand-text {
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+.sbl-sidebar-toggle {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-on-dark-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+
+.sbl-sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-on-dark);
+}
+
+/* Navigation Scroll Container */
+.sbl-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-3) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sbl-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sbl-nav-group-label {
+  padding: 0 var(--space-3) var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-on-dark-muted);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.sbl-sidebar.is-collapsed .sbl-nav-group-label,
+body.sidebar-collapsed .sbl-nav-group-label {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Navigation Item */
+.sbl-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--text-on-dark-muted);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+
+.sbl-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-on-dark);
+}
+
+.sbl-nav-item.is-active,
+.sbl-nav-item[aria-current="page"] {
+  background-color: rgba(122, 194, 56, 0.16);
+  color: #B4EE7C;
+  border-color: rgba(122, 194, 56, 0.35);
+  font-weight: 600;
+}
+
+.sbl-nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sbl-nav-item.is-active .sbl-nav-icon {
+  color: var(--accent-lime);
+}
+
+.sbl-nav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.sbl-nav-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-on-dark-muted);
+  flex-shrink: 0;
+}
+
+.sbl-sidebar.is-collapsed .sbl-nav-item,
+body.sidebar-collapsed .sbl-nav-item {
+  justify-content: center;
+  padding: 0;
+}
+
+.sbl-sidebar.is-collapsed .sbl-nav-label,
+.sbl-sidebar.is-collapsed .sbl-nav-badge,
+body.sidebar-collapsed .sbl-nav-label,
+body.sidebar-collapsed .sbl-nav-badge {
+  display: none;
+}
+
+/* Collapsed Tooltip */
+.sbl-sidebar.is-collapsed .sbl-nav-item[data-tooltip]::after,
+body.sidebar-collapsed .sbl-nav-item[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: fixed;
+  left: calc(var(--sidebar-width-collapsed) + 8px);
+  background-color: var(--bg-espresso);
+  color: var(--text-on-dark);
+  padding: 5px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateX(-4px);
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+  transition: opacity var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+
+.sbl-sidebar.is-collapsed .sbl-nav-item[data-tooltip]:hover::after,
+.sbl-sidebar.is-collapsed .sbl-nav-item[data-tooltip]:focus-visible::after,
+body.sidebar-collapsed .sbl-nav-item[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Sidebar Footer (Shift & Operator Info) */
+.sbl-sidebar-footer {
+  padding: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.sbl-operator-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sbl-operator-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-moss);
+  color: var(--text-on-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sbl-operator-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.sbl-operator-name {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-on-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sbl-operator-role {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-on-dark-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sbl-sidebar.is-collapsed .sbl-operator-meta,
+body.sidebar-collapsed .sbl-operator-meta {
+  display: none;
+}
+
+/* Mobile Off-Canvas Backdrop */
+.sbl-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-sidebar) - 1);
+  background-color: var(--glass-modal-backdrop);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.sbl-sidebar-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}

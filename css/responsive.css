@@ -1,0 +1,73 @@
+/**
+ * SANBONGLON – Responsive Breakpoints (Desktop, Tablet, Mobile)
+ */
+
+.sbl-mobile-menu-trigger {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .sbl-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sbl-split-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sbl-mobile-menu-trigger {
+    display: inline-flex !important;
+  }
+
+  .sbl-main-wrapper,
+  body.sidebar-collapsed .sbl-main-wrapper,
+  .sbl-app-shell.is-collapsed .sbl-main-wrapper {
+    margin-left: 0;
+  }
+
+  .sbl-sidebar {
+    width: var(--sidebar-width-expanded) !important;
+    transform: translateX(-100%);
+  }
+
+  .sbl-sidebar.is-mobile-open {
+    transform: translateX(0);
+  }
+
+  .sbl-sidebar.is-collapsed .sbl-brand-text,
+  .sbl-sidebar.is-collapsed .sbl-nav-label,
+  .sbl-sidebar.is-collapsed .sbl-nav-badge,
+  .sbl-sidebar.is-collapsed .sbl-operator-meta {
+    display: flex;
+    opacity: 1;
+    width: auto;
+  }
+
+  .sbl-sidebar.is-collapsed .sbl-nav-item {
+    justify-content: flex-start;
+    padding: 0 var(--space-3);
+  }
+
+  .sbl-top-header {
+    padding: 0 var(--space-4);
+    height: 54px;
+  }
+
+  .sbl-main-content {
+    padding: var(--space-4);
+  }
+
+  .sbl-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .sbl-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn, .form-input, .form-select {
+    min-height: 42px;
+  }
+}

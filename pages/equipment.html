@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Thiết Bị & Bảo Trì Sân – SANBONGLON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/animations.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
+  </head>
+  <body data-page="thiet-bi">
+    <div class="sbl-app-shell">
+      <!-- Reusable Sidebar Mount Point -->
+      <div id="sblSidebarMount"></div>
+      <div class="sbl-main-wrapper">
+        <header class="sbl-top-header">
+          <div class="sbl-header-left">
+            <button type="button" class="btn btn-secondary btn-icon btn-sm" data-action="open-mobile-sidebar" aria-label="Mở menu">
+              ☰
+            </button>
+            <div class="sbl-breadcrumb">
+              <span class="font-mono-tech">SANBONGLON</span>
+              <span>/</span>
+              <span>DỊCH VỤ & CẬT CHẤT</span>
+              <span>/</span>
+              <span class="sbl-breadcrumb-current">Quản Lý Thiết Bị & Bảo Trì Sân</span>
+            </div>
+          </div>
+          <!-- Live Top Bar Clock (Thứ Giờ:phút:giây) -->
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="sblTopClock" class="font-mono-tech" style="background:var(--bg-sand);padding:4px 12px;border-radius:var(--radius-xs);font-size:12px;font-weight:700;border:1px solid var(--border-color);">
+              Đang tải giờ...
+            </div>
+            <a href="/" class="btn btn-secondary btn-sm">Mở giao diện đầy đủ (SPA)</a>
+            <button type="button" class="btn btn-lime btn-sm" data-toast="Mở tạo phiếu mới.">
+              + Đặt sân mới
+            </button>
+          </div>
+        </header>
+        <main class="sbl-main-content">
+          <div class="sbl-page-header">
+            <div>
+              <h1 class="sbl-page-title">Quản Lý Thiết Bị & Bảo Trì Sân</h1>
+              <p class="sbl-page-subtitle">Theo dõi đèn pha LED 400W, mặt cỏ, lưới chắn bóng và lịch sử bảo trì kỹ thuật</p>
+            </div>
+            <div class="sbl-page-actions">
+              <input type="search" class="form-input" style="width:240px;" placeholder="Tìm kiếm nhanh trong bảng..." data-table-search="#mainDataTable" />
+            </div>
+          </div>
+
+          <div class="sbl-kpi-strip">
+            
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Đèn pha LED 400W hoạt động</span></div>
+          <div class="sbl-kpi-value">94 / 96 cụm</div>
+          <div class="sbl-kpi-meta"><span>97.9% công suất chiếu sáng</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Sự cố đang xử lý</span></div>
+          <div class="sbl-kpi-value">2 phiếu</div>
+          <div class="sbl-kpi-meta"><span>Sân 05 & Sân 11</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Sự cố khắc phục tháng này</span></div>
+          <div class="sbl-kpi-value">14 phiếu</div>
+          <div class="sbl-kpi-meta"><span>Thời gian xử lý TB: 3.2 giờ</span></div>
+        </div>
+      
+        <div class="sbl-kpi-card">
+          <div class="sbl-kpi-label"><span>Chi phí bảo trì</span></div>
+          <div class="sbl-kpi-value">1.630.000 đ</div>
+          <div class="sbl-kpi-meta"><span>Trong định mức ngân sách</span></div>
+        </div>
+      
+          </div>
+
+          <div class="sbl-panel">
+            <div class="sbl-panel-header">
+              <h2 class="sbl-panel-title">Danh Sách Phiếu Sự Cố Thiết Bị</h2>
+            </div>
+            <div class="sbl-table-scroll">
+              <table class="sbl-table" id="mainDataTable">
+                <thead>
+                  <tr><th>Mã Sự Cố</th><th>Sân</th><th>Hạng Mục Thiết Bị</th><th>Mức Độ</th><th>Trạng Thái</th><th>Chi Phí Dự Toán</th></tr>
+                </thead>
+                <tbody>
+                  
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SC-2026-089</td><td>Sân 05</td><td>Cụm đèn pha LED 400W góc khán đài B</td><td>Cao</td><td>Đang xử lý</td><td>650.000 đ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SC-2026-088</td><td>Sân 11</td><td>Lưới chắn sau cầu môn phía Nam</td><td>Trung bình</td><td>Chờ linh kiện</td><td>320.000 đ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SC-2026-085</td><td>Sân 02</td><td>Đường chỉ trắng khu vực 6m</td><td>Thấp</td><td>Đã khắc phục</td><td>180.000 đ</td>
+        </tr>
+      
+        <tr>
+          <td class="font-mono-tech text-xs font-bold">SC-2026-082</td><td>Sân 09</td><td>Lô bóng thi đấu Động Lực UHV 2.07</td><td>Thấp</td><td>Đã khắc phục</td><td>480.000 đ</td>
+        </tr>
+      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/sidebar-config.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/demo-data.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
