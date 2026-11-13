@@ -747,10 +747,6 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                       </div>
                     )}
                     <div className="flex items-center justify-between text-xs">
-                      <span>Dịch vụ & Nước uống (POS):</span>
-                      <span className="font-mono-tech font-semibold">{formatVND(fin.posTotal)}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
                       <span>Đã cọc trước:</span>
                       <span className="font-mono-tech font-semibold">- {formatVND(selectedBooking.depositPaid)}</span>
                     </div>
@@ -758,8 +754,15 @@ export const ScheduleAndBookingView: React.FC<ScheduleAndBookingViewProps> = ({
                       className="flex items-center justify-between pt-2 border-t text-base font-bold"
                       style={{ borderColor: 'var(--border-color)' }}
                     >
-                      <span>Còn thu tại quầy:</span>
+                      <span>Còn thu tiền sân:</span>
                       <span className="font-mono-tech">{formatVND(fin.remainingBalance)}</span>
+                    </div>
+                    <div
+                      className="flex items-center justify-between pt-2 border-t text-xs"
+                      style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}
+                    >
+                      <span>Dịch vụ & Nước uống (POS) – thanh toán riêng:</span>
+                      <span className="font-mono-tech font-semibold">{formatVND(fin.posTotal)}</span>
                     </div>
                   </div>
                 );

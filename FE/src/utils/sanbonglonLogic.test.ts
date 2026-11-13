@@ -11,6 +11,8 @@ import {
   EXTRA_PRICE_PER_SLOT,
   depositAmountFor,
   getActionBlockReason,
+  isBookingPlaying,
+  calculateOvertimeFee,
   clampStartHour,
   calculatePitchPrice,
   occupancyPercent,
@@ -43,9 +45,9 @@ test('calculateBookingFinancials computes pitch + POS items and remaining balanc
     ],
   });
   assert.equal(result.pitchTotal, 450000);
-  assert.equal(result.posTotal, 90000);
-  assert.equal(result.grandTotal, 540000);
-  assert.equal(result.remainingBalance, 390000);
+  assert.equal(result.posTotal, 90000); // dịch vụ tách riêng
+  assert.equal(result.grandTotal, 450000); // đơn cuối không gồm dịch vụ
+  assert.equal(result.remainingBalance, 300000);
 });
 
 test('hasBookingConflict detects overlapping active slots on the same pitch', () => {
@@ -183,15 +185,26 @@ test('deposit is only 50% or 100% of T, or none when waiting for deposit (BR07)'
   assert.equal(depositAmountFor(1000000, 'pending'), 0);
 });
 
-test('BR18 example: paid 100%, overtime 50.000, unpaid service 40.000 -> remaining 90.000', () => {
+test('paid 100%, overtime 50.000, service 40.000 tách riêng -> remaining 50.000, posTotal 40.000', () => {
   const fin = calculateBookingFinancials({
     pitchPrice: 1000000,
     overtimeAmount: 50000,
     depositPaid: 1000000,
     posItems: [{ productId: 'p1', name: 'Nước', price: 20000, qty: 2 }],
   });
-  assert.equal(fin.grandTotal, 1090000);
-  assert.equal(fin.remainingBalance, 90000);
+  assert.equal(fin.posTotal, 40000);
+  assert.equal(fin.grandTotal, 1050000);
+  assert.equal(fin.remainingBalance, 50000);
+});
+
+test('isBookingPlaying / calculateOvertimeFee: giá 50.000/30p chỉ khi đang đá', () => {
+  assert.equal(isBookingPlaying({ status: 'checked-in' }), true);
+  for (const status of ['confirmed', 'pending', 'boom', 'cancelled'] as const) {
+    assert.equal(isBookingPlaying({ status }), false, status);
+    assert.equal(calculateOvertimeFee({ status }, 0.5), 0, status);
+  }
+  assert.equal(calculateOvertimeFee({ status: 'checked-in' }, 0.5), 50000);
+  assert.equal(calculateOvertimeFee({ status: 'checked-in' }, 1), 100000);
 });
 
 test('calculatePitchPrice charges each half-hour in its own price band', () => {

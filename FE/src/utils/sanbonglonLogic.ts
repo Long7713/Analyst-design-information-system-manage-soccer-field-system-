@@ -41,6 +41,30 @@ export const TOTAL_OPERATING_HOURS = OPERATING_END_HOUR - OPERATING_START_HOUR; 
 export const EXTRA_SLOT_HOURS = 0.5;
 export const EXTRA_PRICE_PER_SLOT = 50000;
 
+/**
+ * Giá thuê sân thường (vd 300.000 đ/giờ) đi vào tiền sân T qua calculatePitchPrice.
+ * Giá thêm giờ 50.000 đ/30 phút là giá riêng, CHỈ áp dụng khi sân đang đá.
+ */
+export function isBookingPlaying(booking: Pick<PitchBooking, 'status'>): boolean {
+  return booking.status === 'checked-in';
+}
+
+/** Có được tính giá thêm giờ 50.000 đ/30 phút cho phiếu này không (chỉ khi đang đá). */
+export function canApplyOvertimeRate(booking: Pick<PitchBooking, 'status'>): boolean {
+  return isBookingPlaying(booking);
+}
+
+/**
+ * Phụ phí thêm giờ cho `addedHours` giờ. Không đang đá -> 0 (không được tính giá thêm giờ).
+ */
+export function calculateOvertimeFee(
+  booking: Pick<PitchBooking, 'status'>,
+  addedHours: number
+): number {
+  if (!canApplyOvertimeRate(booking) || addedHours <= 0) return 0;
+  return Math.round((addedHours / EXTRA_SLOT_HOURS) * EXTRA_PRICE_PER_SLOT);
+}
+
 /** Mọi mốc giờ bắt đầu hợp lệ trên timeline: 07:00, 07:30, ... 23:30. */
 export const START_HOUR_OPTIONS: number[] = Array.from(
   { length: TOTAL_OPERATING_HOURS * 2 },
@@ -141,8 +165,8 @@ export function calculateBookingFinancials(
   const pitchTotal = Math.max(0, booking.pitchPrice);
   const posTotal = booking.posItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const overtimeTotal = Math.max(0, booking.overtimeAmount ?? 0);
-  // BR18: tổng phải trả = tiền sân + thêm giờ + dịch vụ.
-  const grandTotal = pitchTotal + overtimeTotal + posTotal;
+  // Đơn cuối = tiền sân + thêm giờ. Tiền dịch vụ/POS tách riêng, thanh toán riêng, không cộng vào đơn.
+  const grandTotal = pitchTotal + overtimeTotal;
   const remainingBalance = Math.max(0, grandTotal - booking.depositPaid);
 
   return {
@@ -205,7 +229,7 @@ export function getActionBlockReason(
       if (s === 'checked-in') return 'Đơn đã nhận sân trước đó.';
       return 'Đơn đã hủy hoặc khách không đến, không thể nhận sân.';
     case 'them-gio':
-      return s === 'checked-in' ? null : 'Chỉ thêm giờ được cho đơn đang đá (đã nhận sân).';
+      return canApplyOvertimeRate(booking) ? null : 'Chỉ thêm giờ được cho đơn đang đá (đã nhận sân).';
     case 'bao-boom':
       return s === 'confirmed' ? null : 'Chỉ ghi nhận vắng mặt cho đơn đã xác nhận và chưa nhận sân.';
     case 'huy-san':
@@ -240,9 +264,7 @@ export function applyBookingAction(
         ...booking,
         durationHours: nextDuration,
         // Phụ phí thêm giờ ghi riêng, không cộng vào tiền sân ban đầu T.
-        overtimeAmount:
-          (booking.overtimeAmount ?? 0) +
-          Math.round((actualAdded / EXTRA_SLOT_HOURS) * EXTRA_PRICE_PER_SLOT),
+        overtimeAmount: (booking.overtimeAmount ?? 0) + calculateOvertimeFee(booking, actualAdded),
       };
     }
 
