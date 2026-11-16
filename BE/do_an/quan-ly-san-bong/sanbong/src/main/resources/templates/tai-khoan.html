@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Đổi mật khẩu')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('taikhoan')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Đổi mật khẩu')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Tài khoản của tôi</h1><p class="sub" th:if="${nvHienTai}" th:text="${nvHienTai.hoTen}"></p></div></div>
+<div class="panel" style="max-width:480px"><div class="panel-h"><h3>Đổi mật khẩu</h3></div><div class="panel-b">
+<form method="post" th:action="@{/tai-khoan/doi-mat-khau}" class="form-grid">
+  <div class="full"><label>Mật khẩu hiện tại</label><input type="password" name="matKhauCu" required></div>
+  <div class="full"><label>Mật khẩu mới (≥ 6 ký tự)</label><input type="password" name="matKhauMoi" minlength="6" required></div>
+  <div class="full"><button class="btn primary">Đổi mật khẩu</button></div>
+</form></div></div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Lịch sân công khai')}"></head>
+<body><div class="public">
+<div class="page-head"><div><h1>Lịch sân công khai – SanBongLon</h1>
+ <p class="sub">12 sân mini 5 người · mở cửa 07:00 – 24:00 · Ngày <b th:text="${ngay}"></b> (<span th:text="${thu}"></span>) · Liên hệ quầy để đặt sân</p></div>
+ <form method="get" class="date-form"><input type="date" name="ngay" th:value="${ngay}" onchange="this.form.submit()"><a class="btn" th:href="@{/login}">Đăng nhập nhân viên</a></form></div>
+<div class="panel"><table>
+ <tr><th style="width:120px">Sân</th><th>Khung giờ đã có người đặt</th></tr>
+ <tr th:each="r : ${data.rows}"><td><b th:text="${r.san.ten}"></b></td>
+  <td><span th:each="d : ${r.items}" th:if="${d.trangThai != 'da_huy' and d.trangThai != 'khach_boom'}" class="badge vang" style="margin:2px" th:text="${d.batDau} + ' – ' + ${d.ketThuc}"></span>
+      <span class="muted" th:if="${#lists.isEmpty(r.items)}">Còn trống cả ngày</span></td></tr>
+</table></div></div>
+<script th:src="@{/js/app.js}"></script></body></html>

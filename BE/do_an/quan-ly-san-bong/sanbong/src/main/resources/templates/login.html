@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Đăng nhập')}"></head>
+<body>
+<div class="login-wrap"><div class="login-box">
+  <div class="brand" style="border:0;padding:0 0 16px"><div class="logo">SB</div><div><b style="color:#111">SANBONGLON</b><small style="color:#888">CENTRAL PITCH OPS</small></div></div>
+  <h1>Đăng nhập</h1><p class="muted" style="margin:4px 0 18px">Hệ thống quản lý sân bóng đá mini nhân tạo</p>
+  <div class="alert err" th:if="${param.error}">Sai tên đăng nhập / mật khẩu hoặc tài khoản đã bị khóa.</div>
+  <div class="alert ok" th:if="${param.dangxuat}">Bạn đã đăng xuất.</div>
+  <form method="post" th:action="@{/login}">
+    <label>Tên đăng nhập</label><input name="username" autofocus required>
+    <label>Mật khẩu</label><input type="password" name="password" required>
+    <button class="btn primary">Đăng nhập</button>
+  </form>
+  <p class="muted" style="margin-top:14px"><a th:href="@{/cong-khai}">Xem lịch sân công khai ›</a></p>
+</div></div>
+</body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ======== Bảng thông tin + nút thao tác của 1 đơn ======== -->
+<div th:fragment="panel(d, ve)">
+  <div class="pb-head">
+    <h3 th:text="${d.tenSan} + ' · ' + ${d.batDau} + ' → ' + ${d.ketThuc}">Sân 01</h3>
+    <span class="badge" th:classappend="${d.css}" th:text="${d.nhan}">Đã cọc</span>
+  </div>
+  <dl class="kv">
+    <dt>Mã đơn</dt><dd class="mono" th:text="'SBL-' + ${d.maDatSan}">SBL-1</dd>
+    <dt>Khách hàng</dt><dd th:text="${d.tenKh}">Khách</dd>
+    <dt>Số điện thoại</dt><dd class="mono" th:text="${d.sdt}">090</dd>
+    <dt>Ngày đặt sân</dt><dd th:text="${d.ngay}">2026-10-20</dd>
+    <dt>Thời gian</dt><dd th:text="${d.batDau} + ' → ' + ${d.ketThuc} + ' (' + ${d.soGio} + ' giờ)'">17:00 → 18:00</dd>
+    <dt>Tiền sân</dt><dd th:text="${#numbers.formatInteger(d.tienSan,1,'POINT')} + 'đ'">0đ</dd>
+    <dt th:if="${d.tienThemGio > 0}">Tiền thêm giờ</dt><dd th:if="${d.tienThemGio > 0}" th:text="${#numbers.formatInteger(d.tienThemGio,1,'POINT')} + 'đ'">0đ</dd>
+    <dt>Tiền cọc</dt><dd th:text="${#numbers.formatInteger(d.tienCoc,1,'POINT')} + 'đ'">0đ</dd>
+    <dt>Cần thu tại sân</dt><dd><b th:text="${#numbers.formatInteger(d.tienThu,1,'POINT')} + 'đ'">0đ</b></dd>
+    <dt th:if="${d.trangThai == 'da_huy' or d.trangThai == 'khach_boom'}">Cọc giữ lại</dt>
+    <dd th:if="${d.trangThai == 'da_huy' or d.trangThai == 'khach_boom'}" th:text="${#numbers.formatInteger(d.tienGiuLai,1,'POINT')} + 'đ (tính vào doanh thu)'">0đ</dd>
+    <dt>Nhân viên tạo đơn</dt><dd th:text="${d.tenNvTao}">NV</dd>
+  </dl>
+  <div class="actions">
+    <form th:if="${d.canXacNhanCoc}" method="post" th:action="@{/dat-san/{id}/xac-nhan-coc(id=${d.maDatSan})}">
+      <input type="hidden" name="ve" th:value="${ve}"><button class="btn primary">Xác nhận đã cọc</button></form>
+    <form th:if="${d.canNhanSan}" method="post" th:action="@{/dat-san/{id}/nhan-san(id=${d.maDatSan})}">
+      <input type="hidden" name="ve" th:value="${ve}"><button class="btn primary">Nhận sân (check-in)</button></form>
+    <form th:if="${d.canKetThuc}" method="post" th:action="@{/dat-san/{id}/ket-thuc(id=${d.maDatSan})}">
+      <input type="hidden" name="ve" th:value="${ve}"><button class="btn primary">Kết thúc trận</button></form>
+    <a th:if="${d.canThemGio}" class="btn" th:href="@{/dat-san/{id}(id=${d.maDatSan})}">Thêm giờ</a>
+    <a th:if="${d.canDoiGio}" class="btn" th:href="@{/dat-san/{id}(id=${d.maDatSan})}">Đổi thời gian</a>
+    <form th:if="${d.canHoaDon}" method="post" th:action="@{/dat-san/{id}/hoa-don(id=${d.maDatSan})}">
+      <button class="btn">In hóa đơn</button></form>
+    <form th:if="${d.canBoom}" method="post" th:action="@{/dat-san/{id}/boom(id=${d.maDatSan})}"
+          onsubmit="return confirm('Xác nhận khách đã không đến sân?')">
+      <input type="hidden" name="ve" th:value="${ve}"><button class="btn danger">Khách boom sân</button></form>
+    <form th:if="${d.canHuy}" method="post" th:action="@{/dat-san/{id}/huy(id=${d.maDatSan})}"
+          onsubmit="return confirm('Bạn có chắc chắn muốn hủy sân này không?')">
+      <input type="hidden" name="ve" th:value="${ve}"><button class="btn danger">Hủy sân</button></form>
+    <a class="btn" th:href="@{/dat-san/{id}(id=${d.maDatSan})}">Chi tiết ›</a>
+  </div>
+</div>
+
+<!-- ======== Modal đặt sân mới ======== -->
+<div class="modal" id="modalDatSan" th:fragment="modalDatSan">
+  <div class="modal-box">
+    <div class="modal-h"><h3>Đặt sân mới</h3><button type="button" onclick="dongModal('modalDatSan')">×</button></div>
+    <div class="modal-b">
+      <form id="formDatSan" method="post" th:action="@{/dat-san/tao}" autocomplete="off">
+        <input type="hidden" name="ve" value="">
+        <div class="form-grid">
+          <div><label>Sân</label>
+            <select name="maSan"><option th:each="s : ${dsSan}" th:if="${s.trangThai == 'hoat_dong'}" th:value="${s.maSan}" th:text="${s.ten}"></option></select></div>
+          <div><label>Ngày đặt sân</label><input type="date" name="ngay" th:value="${hnay}" required></div>
+          <div><label>Giờ bắt đầu</label>
+            <select name="batDau"><option th:each="g : ${gioDat}" th:value="${g}" th:text="${g}" th:selected="${g == '17:00'}"></option></select></div>
+          <div><label>Thời lượng</label>
+            <select name="soPhut"><option value="60">1 giờ</option><option value="90">1,5 giờ</option><option value="120">2 giờ</option></select></div>
+          <div><label>Số điện thoại</label><input name="sdt" placeholder="090xxxxxxx" required></div>
+          <div><label>Tên khách hàng / đội</label><input name="tenKh" required></div>
+          <div class="full"><div class="alert warn" id="canhBaoKhach" style="display:none;margin:0"></div></div>
+          <div><label>Tiền cọc (mặc định 40%)</label><input type="number" name="tienCoc" min="0" step="1000"></div>
+          <div class="chk" style="padding-top:20px"><input type="checkbox" name="daCoc" value="true" id="daCoc" checked><label for="daCoc" style="margin:0">Khách đã chuyển cọc</label></div>
+          <div class="full"><label>Ghi chú</label><input name="ghiChu"></div>
+        </div>
+        <div class="kq" id="kqDat"></div>
+        <div class="actions" style="justify-content:flex-end">
+          <button type="button" class="btn" onclick="dongModal('modalDatSan')">Đóng</button>
+          <button class="btn primary" id="btnLuuDat">Xác nhận đặt sân</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ======== Modal chi tiết (nội dung nạp bằng JS) ======== -->
+<div class="modal" id="modalChiTiet" th:fragment="modalChiTiet">
+  <div class="modal-box">
+    <div class="modal-h"><h3>Chi tiết đơn đặt sân</h3><button type="button" onclick="dongModal('modalChiTiet')">×</button></div>
+    <div class="modal-b" id="ctBody"></div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Khách hàng')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('khach')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Khách hàng')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Khách hàng</h1><p class="sub">Số liệu đặt sân, hủy, boom, tổng giờ, tổng chi đều được tính trực tiếp từ các đơn đặt sân.</p></div>
+ <form class="date-form" method="get"><input name="q" th:value="${q}" placeholder="🔍 Tên / SĐT"><button class="btn">Tìm</button></form></div>
+<div class="grid2">
+ <div class="panel"><div class="panel-h"><h3 th:text="'Top 10 khách hàng thân thiết – tháng ' + ${thang}">Top 10</h3></div>
+  <table><tr><th>#</th><th>Khách</th><th class="r">Lần đá</th><th class="r">Giờ</th><th class="r">Chi tiêu</th></tr>
+   <tr th:each="t,i : ${top}"><td th:text="${i.count}"></td><td><a th:href="@{/khach-hang/{id}(id=${t.khach.maKh})}" th:text="${t.khach.tenKh}"></a></td>
+    <td class="r" th:text="${t.soLanDa}"></td><td class="r" th:text="${t.tongGioStr}"></td><td class="r" th:text="${#numbers.formatInteger(t.tongChi,1,'POINT')} + 'đ'"></td></tr>
+   <tr th:if="${#lists.isEmpty(top)}"><td colspan="5" class="muted">Chưa có dữ liệu trong tháng.</td></tr></table></div>
+ <div class="panel"><div class="panel-h"><h3>Khách hàng boom sân</h3></div>
+  <table><tr><th>Khách</th><th>SĐT</th><th class="r">Số lần boom</th></tr>
+   <tr th:each="t : ${boom}"><td><a th:href="@{/khach-hang/{id}(id=${t.khach.maKh})}" th:text="${t.khach.tenKh}"></a></td><td class="mono" th:text="${t.khach.soDienThoai}"></td>
+    <td class="r"><span class="badge boom" th:text="${t.soLanBoom}"></span></td></tr>
+   <tr th:if="${#lists.isEmpty(boom)}"><td colspan="3" class="muted">Chưa có khách nào boom sân.</td></tr></table></div>
+</div>
+<div class="panel"><div class="panel-h"><h3>Danh sách khách hàng</h3>
+ <details><summary class="btn primary">＋ Thêm khách</summary>
+  <form method="post" th:action="@{/khach-hang/luu}" class="form-grid" style="margin-top:10px">
+   <div><label>Tên khách</label><input name="tenKh" required></div><div><label>Số điện thoại</label><input name="sdt" required></div>
+   <div class="full"><label>Ghi chú</label><input name="ghiChu"></div><div><button class="btn primary">Lưu</button></div></form></details></div>
+ <table><tr><th>Mã</th><th>Tên</th><th>SĐT</th><th class="r">Đặt</th><th class="r">Đá xong</th><th class="r">Hủy</th><th class="r">Boom</th><th class="r">Tổng giờ</th><th class="r">Tổng chi</th><th>Gần nhất</th><th>Ghi chú</th><th></th></tr>
+  <tr th:each="t : ${ds}"><td th:text="'KH' + ${t.khach.maKh}"></td>
+   <td><a th:href="@{/khach-hang/{id}(id=${t.khach.maKh})}" th:text="${t.khach.tenKh}"></a></td><td class="mono" th:text="${t.khach.soDienThoai}"></td>
+   <td class="r" th:text="${t.soLanDat}"></td><td class="r" th:text="${t.soLanDa}"></td><td class="r" th:text="${t.soLanHuy}"></td>
+   <td class="r"><span th:class="${t.soLanBoom > 0} ? 'badge boom' : ''" th:text="${t.soLanBoom}"></span></td>
+   <td class="r" th:text="${t.tongGioStr}"></td><td class="r" th:text="${#numbers.formatInteger(t.tongChi,1,'POINT')}"></td>
+   <td th:text="${t.ngayGanNhat}"></td><td class="muted" th:text="${t.khach.ghiChu}"></td>
+   <td><details><summary class="btn sm">Sửa</summary>
+    <form method="post" th:action="@{/khach-hang/luu}" class="form-grid" style="margin-top:8px;min-width:260px">
+     <input type="hidden" name="maKh" th:value="${t.khach.maKh}">
+     <div><input name="tenKh" th:value="${t.khach.tenKh}" required></div><div><input name="sdt" th:value="${t.khach.soDienThoai}" required></div>
+     <div class="full"><input name="ghiChu" th:value="${t.khach.ghiChu}" placeholder="Ghi chú"></div><div><button class="btn sm primary">Lưu</button></div></form></details></td></tr>
+ </table></div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Thống kê')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('thongke')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Thống kê')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Thống kê chuyên sâu</h1><p class="sub">Sân · Khách hàng · Nhân viên · Dịch vụ · Kho — theo tháng.</p></div>
+ <form method="get" class="date-form"><input type="month" name="thang" th:value="${thang}" onchange="this.form.submit()"></form></div>
+
+<div class="panel"><div class="panel-h"><h3>1. Thống kê sân bóng</h3></div>
+ <table><tr><th>Sân</th><th class="r">Lượt đặt</th><th class="r">Giờ sử dụng</th><th class="r">Doanh thu</th><th class="r">Hủy</th><th class="r">Boom</th><th>Tỷ lệ sử dụng</th></tr>
+  <tr th:each="s : ${san}"><td th:text="${s.san.ten}"></td><td class="r" th:text="${s.luotDat}"></td><td class="r" th:text="${s.soGio}"></td>
+   <td class="r" th:text="${#numbers.formatInteger(s.doanhThu,1,'POINT')}"></td><td class="r" th:text="${s.huy}"></td><td class="r" th:text="${s.boom}"></td>
+   <td class="bars"><div class="row" style="margin:0"><div class="bar" th:style="'width:' + ${s.tyLe < 100 ? s.tyLe : 100} + 'px'"></div><em th:text="${s.tyLe} + '%'"></em></div></td></tr></table></div>
+
+<div class="panel"><div class="panel-h"><h3>2. Thống kê khách hàng</h3></div><div class="panel-b">
+ <div class="cards" style="margin-bottom:0"><div class="card"><div class="card-t">Tổng số khách hàng</div><div class="big" th:text="${tongKhach}"></div></div>
+  <div class="card"><div class="card-t">Khách mới (tháng)</div><div class="big" th:text="${khachMoi}"></div></div>
+  <div class="card"><div class="card-t">Khách quay lại</div><div class="big" th:text="${khachQuayLai}"></div></div>
+  <div class="card"><div class="card-t">Tổng giờ đá</div><div class="big" th:text="${#numbers.formatDecimal(tongGio,1,1)}"></div></div></div></div>
+ <div class="grid2" style="padding:0 18px 18px">
+  <div><h4>Top khách đặt sân</h4><table><tr th:each="t : ${topDat}"><td th:text="${t.khach.tenKh}"></td><td class="r" th:text="${t.soLanDat} + ' lần'"></td></tr></table></div>
+  <div><h4>Top khách chi tiêu</h4><table><tr th:each="t : ${topChi}"><td th:text="${t.khach.tenKh}"></td><td class="r" th:text="${#numbers.formatInteger(t.tongChi,1,'POINT')} + 'đ'"></td></tr></table></div>
+  <div><h4>Khách boom nhiều nhất</h4><table><tr th:each="t : ${topBoom}"><td th:text="${t.khach.tenKh}"></td><td class="r" th:text="${t.soLanBoom} + ' lần'"></td></tr><tr th:if="${#lists.isEmpty(topBoom)}"><td class="muted">Không có.</td></tr></table></div>
+  <div><h4>Khách hủy nhiều nhất</h4><table><tr th:each="t : ${topHuy}"><td th:text="${t.khach.tenKh}"></td><td class="r" th:text="${t.soLanHuy} + ' lần'"></td></tr><tr th:if="${#lists.isEmpty(topHuy)}"><td class="muted">Không có.</td></tr></table></div>
+ </div></div>
+
+<div class="panel"><div class="panel-h"><h3>3. Thống kê nhân viên</h3></div>
+ <table><tr><th>Nhân viên</th><th class="r">Số ngày làm</th><th class="r">Tổng giờ</th><th class="r">Tổng lương</th><th class="r">Hóa đơn đã tạo</th><th class="r">Lượt đặt sân đã xử lý</th></tr>
+  <tr th:each="n : ${nhanVien}"><td th:text="${n.nv.hoTen}"></td><td class="r" th:text="${n.soNgay}"></td><td class="r" th:text="${#numbers.formatDecimal(n.gio,1,1)}"></td>
+   <td class="r" th:text="${#numbers.formatInteger(n.luong,1,'POINT')}"></td><td class="r" th:text="${n.hoaDon}"></td><td class="r" th:text="${n.donXuLy}"></td></tr></table></div>
+
+<div class="grid2">
+ <div class="panel"><div class="panel-h"><h3>4. Thống kê dịch vụ – bán chạy</h3></div>
+  <table><tr><th>Sản phẩm</th><th class="r">Số lượng bán</th><th class="r">Doanh thu</th></tr>
+   <tr th:each="s : ${dichVu}"><td th:text="${s.ten}"></td><td class="r" th:text="${s.soLuong}"></td><td class="r" th:text="${#numbers.formatInteger(s.doanhThu,1,'POINT')}"></td></tr>
+   <tr th:if="${#lists.isEmpty(dichVu)}"><td colspan="3" class="muted">Chưa có dữ liệu.</td></tr></table></div>
+ <div class="panel"><div class="panel-h"><h3>5. Tồn kho cần chú ý</h3></div><div class="panel-b">
+  <p><b>Sắp hết hàng:</b> <span th:each="s : ${sapHet}" class="badge quagio" th:text="${s.tenSanPham} + ' (' + ${s.soLuongTon} + ')'"></span><span class="muted" th:if="${#lists.isEmpty(sapHet)}">không có</span></p>
+  <p><b>Hết hàng:</b> <span th:each="s : ${hetHang}" class="badge do" th:text="${s.tenSanPham}"></span><span class="muted" th:if="${#lists.isEmpty(hetHang)}">không có</span></p></div></div>
+</div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Khách hàng')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('khach')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Khách hàng')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1 th:text="${k.tenKh}">Khách</h1><p class="sub"><span class="mono" th:text="${k.soDienThoai}"></span> · <a th:href="@{/khach-hang}">‹ Danh sách khách</a></p></div></div>
+<div class="alert warn" th:if="${canhBao}" th:text="'⚠ ' + ${canhBao}"></div>
+<div class="cards">
+ <div class="card"><div class="card-t">Số lần đặt sân</div><div class="big" th:text="${tk.soLanDat}">0</div></div>
+ <div class="card"><div class="card-t">Đá thành công</div><div class="big" th:text="${tk.soLanDa}">0</div></div>
+ <div class="card"><div class="card-t">Hủy / Boom</div><div class="big"><span th:text="${tk.soLanHuy}">0</span> / <span th:text="${tk.soLanBoom}">0</span></div></div>
+ <div class="card"><div class="card-t">Tổng giờ đá</div><div class="big" th:text="${tk.tongGioStr}">0</div></div>
+ <div class="card"><div class="card-t">Tổng đã chi</div><div class="big" style="font-size:22px" th:text="${#numbers.formatInteger(tk.tongChi,1,'POINT')} + 'đ'">0</div></div>
+</div>
+<p class="muted" th:if="${k.ghiChu}" th:text="'Ghi chú: ' + ${k.ghiChu}"></p>
+<div class="panel"><div class="panel-h"><h3>Lịch sử đặt sân</h3></div>
+ <table><tr><th>Mã</th><th>Ngày</th><th>Sân</th><th>Giờ</th><th class="r">Tổng tiền</th><th>Trạng thái</th><th></th></tr>
+ <tr th:each="d : ${ls}"><td class="mono" th:text="'SBL-' + ${d.maDatSan}"></td><td th:text="${d.ngay}"></td><td th:text="${d.tenSan}"></td>
+  <td th:text="${d.batDau} + ' → ' + ${d.ketThuc}"></td><td class="r" th:text="${#numbers.formatInteger(d.tongTien,1,'POINT')}"></td>
+  <td><span class="badge" th:classappend="${d.css}" th:text="${d.nhan}"></span></td><td><a class="btn sm" th:href="@{/dat-san/{id}(id=${d.maDatSan})}">Mở</a></td></tr></table></div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

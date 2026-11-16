@@ -1,0 +1,5 @@
+# Maven build output
+target/
+
+# Local database credentials
+application-local.properties

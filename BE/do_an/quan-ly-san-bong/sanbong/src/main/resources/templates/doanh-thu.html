@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Doanh thu')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('doanhthu')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Doanh thu')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Doanh thu &amp; Quỹ</h1><p class="sub">Doanh thu sân = tiền sân + thêm giờ + cọc giữ lại (khách hủy muộn / boom). Tổng doanh thu = Doanh thu sân + Doanh thu dịch vụ.</p></div></div>
+<div class="panel"><form class="toolbar" method="get" th:action="@{/doanh-thu}">
+  <select name="kieu"><option value="ngay" th:selected="${kieu=='ngay'}">Theo ngày</option><option value="tuan" th:selected="${kieu=='tuan'}">Theo tuần</option><option value="thang" th:selected="${kieu=='thang'}">Theo tháng</option><option value="nam" th:selected="${kieu=='nam'}">Theo năm</option></select>
+  <input type="date" name="tu" th:value="${tu}"> → <input type="date" name="den" th:value="${den}"><button class="btn primary">Xem</button></form></div>
+<div class="cards">
+ <div class="card"><div class="card-t">Doanh thu sân</div><div class="big" style="font-size:24px" th:text="${#numbers.formatInteger(tong.san,1,'POINT')} + 'đ'"></div></div>
+ <div class="card"><div class="card-t">Tiền cọc giữ lại</div><div class="big" style="font-size:24px" th:text="${#numbers.formatInteger(tong.cocGiuLai,1,'POINT')} + 'đ'"></div></div>
+ <div class="card"><div class="card-t">Doanh thu dịch vụ</div><div class="big" style="font-size:24px" th:text="${#numbers.formatInteger(tong.dichVu,1,'POINT')} + 'đ'"></div></div>
+ <div class="card" style="background:#e6f3d9"><div class="card-t">Tổng doanh thu</div><div class="big" style="font-size:24px" th:text="${#numbers.formatInteger(tong.tong,1,'POINT')} + 'đ'"></div></div>
+</div>
+<div class="grid2" style="grid-template-columns:2fr 1fr">
+ <div class="panel"><div class="panel-h"><h3>Biểu đồ cột / đường</h3></div><div class="panel-b"><canvas id="cBar" height="130"></canvas></div></div>
+ <div class="panel"><div class="panel-h"><h3>Cơ cấu doanh thu</h3></div><div class="panel-b"><canvas id="cPie"></canvas></div></div>
+</div>
+<div class="panel"><table>
+ <tr><th>Kỳ</th><th class="r">Tiền sân + thêm giờ</th><th class="r">Cọc giữ lại</th><th class="r">Dịch vụ</th><th class="r">Tổng</th></tr>
+ <tr th:each="d : ${ds}"><td th:text="${d.nhan}"></td><td class="r" th:text="${#numbers.formatInteger(d.san,1,'POINT')}"></td><td class="r" th:text="${#numbers.formatInteger(d.cocGiuLai,1,'POINT')}"></td>
+  <td class="r" th:text="${#numbers.formatInteger(d.dichVu,1,'POINT')}"></td><td class="r"><b th:text="${#numbers.formatInteger(d.tong,1,'POINT')}"></b></td></tr>
+ <tr th:if="${#lists.isEmpty(ds)}"><td colspan="5" class="muted" style="padding:16px">Không có doanh thu trong khoảng này.</td></tr></table></div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+const nhan=/*[[${cNhan}]]*/[], san=/*[[${cSan}]]*/[], coc=/*[[${cCoc}]]*/[], dv=/*[[${cDv}]]*/[], tong=/*[[${cTong}]]*/[];
+const T=/*[[${tong}]]*/{};
+if(window.Chart){
+new Chart(document.getElementById('cBar'),{data:{labels:nhan,datasets:[
+ {type:'bar',label:'Sân',data:san,backgroundColor:'#4c9b1d',stack:'a'},{type:'bar',label:'Cọc giữ lại',data:coc,backgroundColor:'#e6a700',stack:'a'},
+ {type:'bar',label:'Dịch vụ',data:dv,backgroundColor:'#3a7bd5',stack:'a'},{type:'line',label:'Tổng',data:tong,borderColor:'#1d1d1b',tension:.3}]},options:{scales:{x:{stacked:true},y:{stacked:true}}}});
+new Chart(document.getElementById('cPie'),{type:'pie',data:{labels:['Sân','Cọc giữ lại','Dịch vụ'],datasets:[{data:[T.san,T.cocGiuLai,T.dichVu],backgroundColor:['#4c9b1d','#e6a700','#3a7bd5']}]}});
+}
+</script>
+</body>
+</html>

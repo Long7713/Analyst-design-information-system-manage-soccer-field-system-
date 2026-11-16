@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf?.token}"/>
+  <title th:text="${title} + ' · SanBongLon'">SanBongLon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:wght@600;700&display=swap&subset=vietnamese" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" th:fragment="sidebar(active)">
+  <div class="brand">
+    <div class="logo">SB</div>
+    <div><b>SANBONGLON</b><small>CENTRAL PITCH OPS</small></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-g">Điều phối &amp; lịch sân</div>
+    <a th:href="@{/tong-quan}" th:classappend="${active=='tongquan'} ? 'active'"><span>▦ &nbsp;Tổng quan</span><em th:text="${#lists.size(dsSan)} + ' sân'">12 sân</em></a>
+    <a th:href="@{/lich-san}" th:classappend="${active=='lichsan'} ? 'active'"><span>▤ &nbsp;Lịch sân</span><em>07-24h</em></a>
+    <a th:href="@{/dat-san}" th:classappend="${active=='datsan'} ? 'active'"><span>✚ &nbsp;Đặt sân</span></a>
+    <a th:href="@{/khach-hang}" th:classappend="${active=='khach'} ? 'active'"><span>☺ &nbsp;Khách hàng</span></a>
+
+    <div class="nav-g">Dịch vụ &amp; cơ tích hợp</div>
+    <a th:href="@{/dich-vu}" th:classappend="${active=='dichvu'} ? 'active'"><span>▣ &nbsp;Dịch vụ &amp; POS</span><em>POS</em></a>
+    <a sec:authorize="hasRole('QUAN_LY')" th:href="@{/thiet-bi}" th:classappend="${active=='thietbi'} ? 'active'"><span>⚒ &nbsp;Thiết bị &amp; Đèn</span></a>
+    <a sec:authorize="hasRole('QUAN_LY')" th:href="@{/kho}" th:classappend="${active=='kho'} ? 'active'"><span>▥ &nbsp;Kho hàng</span></a>
+    <a sec:authorize="hasRole('QUAN_LY')" th:href="@{/nhan-su}" th:classappend="${active=='nhansu'} ? 'active'"><span>☻ &nbsp;Nhân sự ca</span></a>
+
+    <div sec:authorize="hasRole('QUAN_LY')">
+      <div class="nav-g">Tài chính &amp; quản trị</div>
+      <a th:href="@{/doanh-thu}" th:classappend="${active=='doanhthu'} ? 'active'"><span>₫ &nbsp;Doanh thu &amp; Quỹ</span></a>
+      <a th:href="@{/thong-ke}" th:classappend="${active=='thongke'} ? 'active'"><span>▙ &nbsp;Thống kê chuyên sâu</span><em>5 mảng</em></a>
+      <a th:href="@{/nhat-ky}" th:classappend="${active=='nhatky'} ? 'active'"><span>☰ &nbsp;Nhật ký kiểm toán</span></a>
+      <a th:href="@{/cai-dat}" th:classappend="${active=='caidat'} ? 'active'"><span>⚙ &nbsp;Cài đặt hệ thống</span></a>
+    </div>
+
+    <div class="nav-g">Cổng công khai &amp; ca trực</div>
+    <a th:href="@{/cong-khai}" target="_blank"><span>◎ &nbsp;Trang chủ / Lịch công khai</span></a>
+    <a th:href="@{/tai-khoan}" th:classappend="${active=='taikhoan'} ? 'active'"><span>⚿ &nbsp;Đổi mật khẩu</span></a>
+  </nav>
+  <div class="me">
+    <span class="av" th:text="${nvHienTai != null} ? ${#strings.substring(nvHienTai.hoTen,0,1)} : '?'">T</span>
+    <b th:text="${nvHienTai != null} ? ${nvHienTai.hoTen} : ''">Nhân viên</b>
+    <small sec:authorize="hasRole('QUAN_LY')">Quản lý</small>
+    <small sec:authorize="!hasRole('QUAN_LY')">Nhân viên trực</small>
+    <form th:action="@{/logout}" method="post"><button type="submit">Đăng xuất</button></form>
+  </div>
+</aside>
+
+<!-- ============ TOPBAR ============ -->
+<header class="topbar" th:fragment="topbar(crumb)">
+  <div>SANBONGLON &nbsp;/&nbsp; <span th:text="${crumb}" style="color:#222">Trang</span></div>
+  <div class="clock mono" id="clock">--:--:--</div>
+  <div style="display:flex;gap:10px">
+    <button class="btn primary" type="button" onclick="moDatSan()">＋ Đặt sân mới</button>
+  </div>
+</header>
+
+<!-- ============ THÔNG BÁO ============ -->
+<div th:fragment="thongbao">
+  <div class="alert ok" th:if="${thongBao}" th:text="${thongBao}"></div>
+  <div class="alert warn" th:if="${canhBao}" th:text="${canhBao}"></div>
+  <div class="alert err" th:if="${loi}" th:text="${loi}"></div>
+</div>
+</body>
+</html>

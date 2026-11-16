@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Đặt sân')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('datsan')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Đặt sân')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Quản lý đặt sân</h1><p class="sub">Danh sách đơn theo khoảng ngày. Đơn không bị xóa, chỉ đổi trạng thái để giữ lịch sử.</p></div>
+  <button class="btn primary" type="button" onclick="moDatSan()">＋ Đặt sân mới</button></div>
+<div class="panel">
+ <form class="toolbar" method="get" th:action="@{/dat-san}">
+  <div><label>Từ ngày</label><input type="date" name="tu" th:value="${tu}"></div>
+  <div><label>Đến ngày</label><input type="date" name="den" th:value="${den}"></div>
+  <div><label>Trạng thái</label><select name="trangThai">
+    <option value="">Tất cả</option>
+    <option value="cho_xac_nhan" th:selected="${trangThai=='cho_xac_nhan'}">Chờ cọc</option>
+    <option value="da_xac_nhan" th:selected="${trangThai=='da_xac_nhan'}">Đã cọc</option>
+    <option value="dang_da" th:selected="${trangThai=='dang_da'}">Đang đá</option>
+    <option value="da_da_xong" th:selected="${trangThai=='da_da_xong'}">Đã đá xong</option>
+    <option value="da_huy" th:selected="${trangThai=='da_huy'}">Đã hủy</option>
+    <option value="khach_boom" th:selected="${trangThai=='khach_boom'}">Khách boom</option></select></div>
+  <div><label>Tìm</label><input name="q" th:value="${q}" placeholder="Tên, SĐT, SBL-.."></div>
+  <div style="padding-top:18px"><button class="btn primary">Lọc</button></div>
+ </form>
+ <table>
+  <tr><th>Mã</th><th>Khách hàng</th><th>SĐT</th><th>Sân</th><th>Ngày</th><th>Giờ</th><th class="r">Tiền sân</th><th class="r">Cọc</th><th>Trạng thái</th><th></th></tr>
+  <tr th:each="d : ${ds}">
+    <td class="mono" th:text="'SBL-' + ${d.maDatSan}"></td><td th:text="${d.tenKh}"></td><td class="mono" th:text="${d.sdt}"></td>
+    <td th:text="${d.tenSan}"></td><td th:text="${d.ngay}"></td>
+    <td class="mono" th:text="${d.batDau} + ' → ' + ${d.ketThuc} + ' (' + ${d.soGio} + 'h)'"></td>
+    <td class="r" th:text="${#numbers.formatInteger(d.tongTien,1,'POINT')}"></td>
+    <td class="r" th:text="${#numbers.formatInteger(d.tienCoc,1,'POINT')}"></td>
+    <td><span class="badge" th:classappend="${d.css}" th:text="${d.nhan}"></span></td>
+    <td><a class="btn sm" th:href="@{/dat-san/{id}(id=${d.maDatSan})}">Thao tác ›</a></td></tr>
+  <tr th:if="${#lists.isEmpty(ds)}"><td colspan="10" class="muted" style="padding:20px">Không có đơn đặt sân nào.</td></tr>
+ </table>
+</div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Lịch sân')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('lichsan')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Lịch sân')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head">
+  <div>
+    <h1>Trung Tâm Điều Phối &amp; Lịch Sân (07:00 – 24:00)</h1>
+    <p class="sub">Cụm 12 sân mini 5 người. Ngày trực: <b class="mono" th:text="${ngay}">2026-10-20</b> (<span th:text="${thu}">Thứ Ba</span>) · Bấm vào ô trống để đặt sân, bấm vào ca để xem / thao tác.</p>
+  </div>
+  <form class="date-form" method="get" th:action="@{/lich-san}">
+    <label style="margin:0">Ngày:</label>
+    <a class="btn-sq" th:href="@{/lich-san(ngay=${ngay.minusDays(1)})}">‹</a>
+    <input type="date" name="ngay" th:value="${ngay}" onchange="this.form.submit()">
+    <a class="btn-sq" th:href="@{/lich-san(ngay=${ngay.plusDays(1)})}">›</a>
+    <a class="btn" th:href="@{/lich-san}">Hôm nay</a>
+    <button type="button" class="btn primary" onclick="moDatSan()">＋ Đặt sân mới</button>
+  </form>
+</div>
+
+<div class="cards">
+  <div class="card"><div class="card-t"><span>Đang nhận sân</span><span>✓</span></div>
+    <div class="big"><span th:text="${data.dangDa}">0</span> <small>ca</small></div><div class="muted">Đã check-in đúng giờ</div></div>
+  <div class="card"><div class="card-t"><span>Đã cọc giữ sân</span><span>▤</span></div>
+    <div class="big"><span th:text="${data.daCoc}">0</span> <small>ca</small></div><div class="muted">Chờ đến nhận sân · Đã cọc</div></div>
+  <div class="card"><div class="card-t"><span>Chờ chuyển khoản cọc</span><span>◷</span></div>
+    <div class="big"><span th:text="${data.choCoc}">0</span> <small>ca</small></div><div class="muted">Cần xác nhận cọc trước giờ đá</div></div>
+  <div class="card"><div class="card-t"><span>Báo Boom / Quá giờ</span><span>⚠</span></div>
+    <div class="big"><span th:text="${data.quaGio}">0</span> <small>ca</small></div><div class="muted">Quá giờ 20 phút, khách chưa đến</div></div>
+</div>
+
+<div class="panel">
+  <div class="toolbar">
+    <div class="chips"><button class="chip on" type="button" data-f="">Tất cả 12 sân</button></div>
+    <div class="chips">
+      <button class="chip on" type="button" data-f="">Mọi trạng thái</button>
+      <button class="chip" type="button" data-f="da">Đang đá</button>
+      <button class="chip" type="button" data-f="coc">Đã cọc</button>
+      <button class="chip" type="button" data-f="choc">Chờ cọc</button>
+      <button class="chip" type="button" data-f="boom">Báo Boom</button>
+    </div>
+    <input class="search" id="timKiem" placeholder="🔍 Tìm tên đội, SĐT, mã đơn (SBL-)...">
+  </div>
+  <div class="tl"><div class="tl-in">
+    <div class="tl-head">
+      <div class="tl-corner">SÂN / KHUNG GIỜ</div>
+      <div class="tl-hours"><div class="tl-h" th:each="g : ${gioList}" th:text="${g}">07:00</div></div>
+    </div>
+    <div class="tl-row" th:each="r : ${data.rows}">
+      <div class="tl-label">
+        <button type="button" class="plus" th:data-san="${r.san.maSan}" onclick="moDatSan(this.dataset.san)">+</button>
+        <b th:text="${r.san.ten}">Sân 01</b>
+        <small><span th:if="${r.san.trangThai == 'hoat_dong'}">Sân 5 người · </span><span th:if="${r.san.trangThai != 'hoat_dong'}" style="color:#c62828">Ngừng hoạt động · </span><br>
+          <span th:text="${#numbers.formatInteger(r.gia,1,'POINT')} + ' đ/h'">360.000 đ/h</span></small>
+      </div>
+      <div class="tl-grid" th:data-san="${r.san.maSan}" th:data-ngay="${ngay}">
+        <div class="tl-cell" th:each="g : ${gioList}"></div>
+        <div th:each="d : ${r.items}" class="bk" th:classappend="${d.css}"
+             th:style="'left:' + ${d.left} + '%;width:' + ${d.width} + '%'"
+             th:attr="data-id=${d.maDatSan},data-tt=${d.css},data-search=${#strings.toLowerCase(d.tenKh + ' ' + d.sdt + ' sbl-' + d.maDatSan)}">
+          <b th:text="${d.tenKh}">Khách</b>
+          <span th:text="${d.batDau} + '-' + ${d.ketThuc} + ' · ' + ${d.nhan}">17:30-19:00</span>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+<div class="muted">Chú thích màu: <b>Trắng</b> chưa đến giờ · <b style="background:#fff3b0">Vàng</b> còn 10 phút · <b style="background:#d9f2c4">Xanh lá</b> đang đá · <b style="background:#e9f6e0">Xanh ✓</b> đã đá xong · <b style="background:#fde3e3">Đỏ</b> đã hủy · <b style="background:#fbd3e0">Hồng</b> khách boom · <b style="background:#ffe3c2">Cam</b> quá giờ chưa đến</div>
+
+<div hidden>
+  <div th:each="d : ${data.tatCa}" th:id="'bk-' + ${d.maDatSan}">
+    <div th:replace="~{fragments/booking :: panel(${d}, ${veUrl})}"></div>
+  </div>
+</div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

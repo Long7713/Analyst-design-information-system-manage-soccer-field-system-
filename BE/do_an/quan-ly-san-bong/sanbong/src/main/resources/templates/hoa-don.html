@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Hóa đơn')}"></head>
+<body style="background:#eee">
+<div class="no-print" style="text-align:center;padding:14px"><button class="btn primary" onclick="window.print()">🖨 In hóa đơn</button>
+ <a class="btn" th:href="@{/dat-san/{id}(id=${d.maDatSan})}">‹ Quay lại đơn</a></div>
+<div class="invoice">
+ <h2>HÓA ĐƠN ĐẶT SÂN</h2><p style="text-align:center;margin:0" class="muted">SANBONGLON · Sân bóng đá mini nhân tạo</p><hr>
+ <div class="row"><span>Mã hóa đơn</span><b class="mono" th:text="'HD-' + ${hd.maHoaDon}"></b></div>
+ <div class="row"><span>Ngày lập</span><span th:text="${#temporals.format(hd.ngayLap,'dd/MM/yyyy')}"></span></div>
+ <div class="row"><span>Tên khách hàng</span><span th:text="${d.khachHang.tenKh}"></span></div>
+ <div class="row"><span>Số điện thoại</span><span th:text="${d.khachHang.soDienThoai}"></span></div>
+ <div class="row"><span>Tên sân</span><span th:text="${d.sanBong.ten}"></span></div>
+ <div class="row"><span>Ngày đặt sân</span><span th:text="${#temporals.format(d.ngayDat,'dd/MM/yyyy')}"></span></div>
+ <div class="row"><span>Thời gian</span><span th:text="${d.batDauStr} + ' → ' + ${d.ketThucStr}"></span></div>
+ <div class="row"><span>Số giờ đá</span><span th:text="${d.soGioStr} + ' giờ'"></span></div><hr>
+ <div class="row"><span>Tiền sân</span><span th:text="${#numbers.formatInteger(d.tienSan,1,'POINT')} + 'đ'"></span></div>
+ <div class="row" th:each="t : ${d.dsThemGio}"><span th:text="'Thêm giờ ' + ${t.soPhutThem} + ' phút'"></span><span th:text="${#numbers.formatInteger(t.tienThemGio,1,'POINT')} + 'đ'"></span></div>
+ <div class="row"><span>Tiền thêm giờ</span><span th:text="${#numbers.formatInteger(d.tongTienThemGio,1,'POINT')} + 'đ'"></span></div>
+ <div class="row tot"><span>Tổng tiền</span><span th:text="${#numbers.formatInteger(d.tongTien,1,'POINT')} + 'đ'"></span></div>
+ <div class="row"><span>Tiền đã cọc</span><span th:text="'- ' + ${#numbers.formatInteger(d.tienCoc,1,'POINT')} + 'đ'"></span></div>
+ <div class="row tot" style="color:#3d8015"><span>Số tiền cần thu tại sân</span><span th:text="${#numbers.formatInteger(d.tienThuTaiSan,1,'POINT')} + 'đ'"></span></div><hr>
+ <p class="muted" th:text="'Ghi chú: ' + ${hd.ghiChu}"></p>
+ <p class="muted" th:if="${hd.nvLap}" th:text="'Nhân viên lập: ' + ${hd.nvLap.hoTen}"></p>
+</div></body></html>

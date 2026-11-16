@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Phiếu nhập')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('kho')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Phiếu nhập')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Tạo phiếu nhập</h1><p class="sub"><a th:href="@{/kho}">‹ Về kho hàng</a> · Mỗi dòng là một sản phẩm HOẶC một thiết bị.</p></div></div>
+<form method="post" th:action="@{/kho/phieu-nhap/luu}" id="fPn">
+<div class="panel"><div class="panel-b form-grid">
+  <div><label>Nhà cung cấp</label><select name="maNcc"><option value="">— Không chọn —</option><option th:each="n : ${dsNcc}" th:value="${n.maNcc}" th:text="${n.tenNcc}"></option></select></div>
+  <div><label>Ngày nhập</label><input type="date" name="ngayNhap" th:value="${homNay}"></div>
+  <div class="full"><label>Ghi chú</label><input name="ghiChu"></div></div></div>
+<div class="panel"><div class="panel-h"><h3>Chi tiết phiếu nhập</h3><button type="button" class="btn sm" onclick="themDong()">＋ Thêm dòng</button></div>
+ <table id="tbDong"><tr><th>Hàng nhập</th><th style="width:110px">Số lượng</th><th style="width:150px">Đơn giá nhập</th><th class="r" style="width:140px">Thành tiền</th><th></th></tr></table>
+ <div class="panel-b" style="text-align:right">Tổng tiền nhập: <b id="tong">0</b>đ</div></div>
+<div class="actions">
+  <button class="btn" name="hanhDong" value="nhap">Lưu nháp</button>
+  <button class="btn" name="hanhDong" value="cho_xac_nhan">Gửi chờ xác nhận</button>
+  <button class="btn primary" name="hanhDong" value="xac_nhan">Lưu &amp; xác nhận (cộng kho)</button></div>
+</form>
+<template id="tpl"><tr>
+ <td><select class="hang" onchange="dongBo(this.closest('tr'))">
+   <optgroup label="Sản phẩm dịch vụ"><option th:each="s : ${dsSp}" th:value="'sp-' + ${s.maSanPham}" th:text="${s.tenSanPham}"></option></optgroup>
+   <optgroup label="Thiết bị"><option th:each="t : ${dsTb}" th:value="'tb-' + ${t.maThietBi}" th:text="${t.tenThietBi}"></option></optgroup></select>
+   <input type="hidden" name="loai"><input type="hidden" name="maHang"></td>
+ <td><input type="number" name="soLuong" min="1" value="1" oninput="tinh()" style="width:100%"></td>
+ <td><input type="number" name="donGia" min="0" value="0" oninput="tinh()" style="width:100%"></td>
+ <td class="r tt">0</td><td><button type="button" class="btn sm danger" onclick="this.closest('tr').remove();tinh()">×</button></td></tr></template>
+
+</main>
+</div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+<script>
+function dongBo(tr){const v=tr.querySelector('.hang').value.split('-');tr.querySelector('[name=loai]').value=v[0];tr.querySelector('[name=maHang]').value=v[1];}
+function themDong(){const tr=document.getElementById('tpl').content.firstElementChild.cloneNode(true);document.getElementById('tbDong').appendChild(tr);dongBo(tr);tinh();}
+function tinh(){let t=0;document.querySelectorAll('#tbDong tr').forEach(r=>{const a=r.querySelector('[name=soLuong]');if(!a)return;const v=a.value*r.querySelector('[name=donGia]').value;r.querySelector('.tt').textContent=new Intl.NumberFormat('vi-VN').format(v);t+=v;});document.getElementById('tong').textContent=new Intl.NumberFormat('vi-VN').format(t);}
+themDong();
+</script>
+</body>
+</html>

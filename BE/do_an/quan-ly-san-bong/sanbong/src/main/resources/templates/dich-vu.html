@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dịch vụ & POS')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('dichvu')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Dịch vụ & POS')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Dịch vụ &amp; POS</h1><p class="sub">Bán bánh, mì tôm, nước ngọt, nước suối… Hệ thống tự kiểm tra tồn kho và trừ kho khi thanh toán.</p></div>
+ <a sec:authorize="hasRole('QUAN_LY')" class="btn" th:href="@{/dich-vu/san-pham}">⚙ Quản lý sản phẩm</a></div>
+<div class="grid2" style="grid-template-columns:1.6fr 1fr">
+ <form method="post" th:action="@{/dich-vu/thanh-toan}" class="panel">
+  <div class="panel-h"><h3>Chọn sản phẩm</h3><button class="btn primary">💳 Thanh toán</button></div>
+  <table><tr><th>Sản phẩm</th><th>Loại</th><th class="r">Giá</th><th class="r">Tồn</th><th style="width:110px">Số lượng</th></tr>
+   <tr th:each="s : ${dsSp}">
+    <td><b th:text="${s.tenSanPham}"></b> <span class="badge boom" th:if="${s.hetHang}">Hết hàng</span><span class="badge quagio" th:if="${s.sapHet}">Sắp hết</span></td>
+    <td class="muted" th:text="${s.loaiSanPham}"></td><td class="r" th:text="${#numbers.formatInteger(s.giaBan,1,'POINT')} + 'đ/' + ${s.donViTinh}"></td>
+    <td class="r" th:text="${s.soLuongTon}"></td>
+    <td><input type="number" min="0" value="0" th:name="'sl_' + ${s.maSanPham}" style="width:90px"></td></tr>
+  </table>
+ </form>
+ <div class="panel"><div class="panel-h"><h3>Bán hàng hôm nay</h3><b th:text="${#numbers.formatInteger(tongHomNay,1,'POINT')} + 'đ'"></b></div>
+  <table><tr><th>Giờ</th><th>NV</th><th>Mặt hàng</th><th class="r">Tiền</th></tr>
+   <tr th:each="h : ${homNay}"><td th:text="${#temporals.format(h.thoiGian,'HH:mm')}"></td><td th:text="${h.nhanVien != null} ? ${h.nhanVien.hoTen} : ''"></td>
+    <td class="muted"><span th:each="c : ${h.chiTiet}" th:text="${c.sanPham.tenSanPham} + ' x' + ${c.soLuong} + '; '"></span></td>
+    <td class="r" th:text="${#numbers.formatInteger(h.tongTien,1,'POINT')}"></td></tr>
+   <tr th:if="${#lists.isEmpty(homNay)}"><td colspan="4" class="muted">Chưa có giao dịch.</td></tr></table></div>
+</div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

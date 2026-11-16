@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Thiết bị & Đèn')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('thietbi')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Thiết bị & Đèn')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Kho thiết bị</h1><p class="sub">Khung thành, đèn sân, thảm cỏ nhân tạo, cao su, bóng, áo lưới… theo từng tình trạng.</p></div>
+ <details><summary class="btn primary">＋ Thêm thiết bị</summary>
+  <form method="post" th:action="@{/thiet-bi/luu}" class="form-grid panel" style="padding:14px;min-width:420px;position:absolute;right:30px;z-index:5">
+   <div><label>Tên thiết bị</label><input name="tenThietBi" required></div><div><label>Loại</label><input name="loaiThietBi"></div>
+   <div><label>SL đang sử dụng</label><input type="number" name="slDangDung" min="0" value="0"></div><div><label>SL trong kho</label><input type="number" name="slTrongKho" min="0" value="0"></div>
+   <div><label>Ngày nhập</label><input type="date" name="ngayNhap" th:value="${hnay}"></div><div><label>Ghi chú</label><input name="ghiChu"></div>
+   <div><button class="btn primary">Lưu</button></div></form></details></div>
+<div class="panel"><table>
+ <tr><th>Mã</th><th>Thiết bị</th><th>Loại</th><th class="r">Tổng</th><th class="r">Đang dùng</th><th class="r">Trong kho</th><th class="r">Hỏng</th><th class="r">Đang sửa</th><th class="r">Thanh lý</th><th>Ngày nhập</th><th>Thao tác</th></tr>
+ <tr th:each="t : ${dsTb}"><td th:text="'TB' + ${t.maThietBi}"></td><td><b th:text="${t.tenThietBi}"></b></td><td th:text="${t.loaiThietBi}"></td>
+  <td class="r"><b th:text="${t.soLuong}"></b></td><td class="r" th:text="${t.slDangDung}"></td><td class="r" th:text="${t.slTrongKho}"></td>
+  <td class="r"><span th:class="${t.slHong > 0} ? 'badge do' : ''" th:text="${t.slHong}"></span></td><td class="r" th:text="${t.slDangSua}"></td><td class="r" th:text="${t.slThanhLy}"></td>
+  <td th:text="${t.ngayNhap}"></td>
+  <td style="white-space:nowrap"><a class="btn sm" th:href="@{/thiet-bi(chon=${t.maThietBi})}">Chi tiết</a>
+   <details style="display:inline-block"><summary class="btn sm">Đổi tình trạng</summary>
+    <form method="post" th:action="@{/thiet-bi/{id}/chuyen(id=${t.maThietBi})}" class="form-grid panel" style="padding:12px;min-width:320px;position:absolute;z-index:5">
+     <div><label>Từ</label><select name="tu"><option value="dang_dung">Đang sử dụng</option><option value="trong_kho">Trong kho</option><option value="hong">Hỏng</option><option value="dang_sua">Đang sửa chữa</option><option value="thanh_ly">Thanh lý</option></select></div><div><label>Sang</label><select name="den"><option value="dang_dung">Đang sử dụng</option><option value="trong_kho">Trong kho</option><option value="hong">Hỏng</option><option value="dang_sua">Đang sửa chữa</option><option value="thanh_ly">Thanh lý</option></select></div>
+     <div><label>Số lượng</label><input type="number" name="soLuong" min="1" value="1"></div><div><label>Lý do</label><input name="lyDo" placeholder="Báo hỏng, ..."></div>
+     <div><button class="btn sm primary">Cập nhật</button></div></form></details></td></tr>
+</table></div>
+
+<div class="panel" th:if="${chon}"><div class="panel-h"><h3 th:text="'Chi tiết: ' + ${chon.tenThietBi}"></h3><a class="btn sm" th:href="@{/thiet-bi}">Đóng</a></div>
+ <table><tr><th>Chi tiết thiết bị</th><th>Sân</th><th>Tình trạng</th><th>Ghi chú</th></tr>
+  <tr th:each="c : ${chiTiet}"><td th:text="${c.tenChiTiet}"></td><td th:text="${c.sanBong != null} ? ${c.sanBong.ten} : '—'"></td>
+   <td><form method="post" th:action="@{/thiet-bi/chi-tiet/{id}/tinh-trang(id=${c.maCtTb})}" style="display:flex;gap:6px">
+     <input type="hidden" name="maThietBi" th:value="${chon.maThietBi}">
+     <select name="tinhTrang" onchange="this.form.submit()">
+      <option value="dang_dung" th:selected="${c.tinhTrang=='dang_dung'}">Đang sử dụng</option><option value="trong_kho" th:selected="${c.tinhTrang=='trong_kho'}">Trong kho</option>
+      <option value="hong" th:selected="${c.tinhTrang=='hong'}">Hỏng</option><option value="dang_sua" th:selected="${c.tinhTrang=='dang_sua'}">Đang sửa chữa</option>
+      <option value="thanh_ly" th:selected="${c.tinhTrang=='thanh_ly'}">Thanh lý</option></select></form></td><td th:text="${c.ghiChu}"></td></tr></table>
+ <form method="post" th:action="@{/thiet-bi/{id}/chi-tiet(id=${chon.maThietBi})}" class="toolbar">
+  <input name="tenChiTiet" placeholder="VD: Khung thành sân 1" required style="width:240px">
+  <select name="maSan"><option value="">— Không gắn sân —</option><option th:each="s : ${dsSan}" th:value="${s.maSan}" th:text="${s.ten}"></option></select>
+  <select name="tinhTrang"><option value="dang_dung">Đang sử dụng</option><option value="trong_kho">Trong kho</option><option value="hong">Hỏng</option><option value="dang_sua">Đang sửa chữa</option><option value="thanh_ly">Thanh lý</option></select><input name="ghiChu" placeholder="Ghi chú"><button class="btn primary">Thêm chi tiết</button></form></div>
+
+<div class="grid2">
+ <div class="panel"><div class="panel-h"><h3>Tạo phiếu bảo trì</h3></div><div class="panel-b">
+  <form method="post" th:action="@{/thiet-bi/bao-tri}" class="form-grid">
+   <div><label>Thiết bị (đang hỏng)</label><select name="maThietBi"><option th:each="t : ${dsTb}" th:if="${t.slHong > 0}" th:value="${t.maThietBi}" th:text="${t.tenThietBi} + ' (hỏng ' + ${t.slHong} + ')'"></option></select></div>
+   <div><label>Số lượng đưa đi sửa</label><input type="number" name="soLuong" min="1" value="1"></div>
+   <div class="full"><label>Nội dung sửa chữa</label><input name="noiDung" required></div>
+   <div><label>Chi phí dự kiến</label><input type="number" name="chiPhi" min="0"></div><div style="padding-top:18px"><button class="btn primary">Tạo phiếu</button></div></form></div></div>
+ <div class="panel"><div class="panel-h"><h3>Phiếu bảo trì</h3></div>
+  <table><tr><th>Thiết bị</th><th>SL</th><th>Bắt đầu</th><th>Nội dung</th><th class="r">Chi phí</th><th>Trạng thái</th></tr>
+   <tr th:each="p : ${dsBaoTri}"><td th:text="${p.thietBi.tenThietBi}"></td><td th:text="${p.soLuong}"></td><td th:text="${p.ngayBatDauSua}"></td><td th:text="${p.noiDungSuaChua}"></td>
+    <td class="r" th:text="${#numbers.formatInteger(p.chiPhi,1,'POINT')}"></td>
+    <td><span th:if="${p.trangThai=='da_hoan_thanh'}" class="badge xanh" th:text="'Xong ' + ${p.ngayHoanThanh}"></span>
+     <form th:if="${p.trangThai=='dang_sua'}" method="post" th:action="@{/thiet-bi/bao-tri/{id}/hoan-thanh(id=${p.maBaoTri})}" style="display:flex;gap:4px">
+      <input type="number" name="chiPhi" placeholder="Chi phí thực" style="width:110px"><button class="btn sm primary">Hoàn thành</button></form></td></tr>
+   <tr th:if="${#lists.isEmpty(dsBaoTri)}"><td colspan="6" class="muted">Chưa có phiếu bảo trì.</td></tr></table></div>
+</div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

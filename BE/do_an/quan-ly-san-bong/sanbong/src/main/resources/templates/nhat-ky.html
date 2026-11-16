@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Nhật ký kiểm toán')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('nhatky')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Nhật ký kiểm toán')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Nhật ký hoạt động</h1><p class="sub">300 thao tác gần nhất: ai làm gì, lúc nào, tác động đối tượng nào.</p></div></div>
+<div class="panel"><table>
+ <tr><th>Thời gian</th><th>Nhân viên</th><th>Thao tác</th><th>Đối tượng</th><th>Nội dung</th></tr>
+ <tr th:each="n : ${ds}"><td class="mono" th:text="${#temporals.format(n.thoiGian,'dd/MM HH:mm:ss')}"></td><td th:text="${n.nhanVien != null} ? ${n.nhanVien.hoTen} : '—'"></td>
+  <td><span class="badge" th:text="${n.thaoTac}"></span></td><td th:text="${n.doiTuong}"></td><td class="muted" th:text="${n.noiDung}"></td></tr></table></div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

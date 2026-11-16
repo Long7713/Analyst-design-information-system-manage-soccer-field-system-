@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Quản lý sản phẩm')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('dichvu')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Quản lý sản phẩm')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Quản lý sản phẩm dịch vụ</h1><p class="sub"><a th:href="@{/dich-vu}">‹ Về màn hình bán hàng</a> · Không xóa sản phẩm, chỉ ngừng kinh doanh. Tồn kho thay đổi qua nhập hàng / bán / ghi hỏng.</p></div>
+ <details><summary class="btn primary">＋ Thêm sản phẩm</summary>
+  <form method="post" th:action="@{/dich-vu/san-pham/luu}" class="form-grid panel" style="padding:14px;margin-top:8px;min-width:420px;position:absolute;right:30px;z-index:5">
+   <div><label>Tên sản phẩm</label><input name="tenSanPham" required></div><div><label>Loại</label><input name="loaiSanPham" placeholder="Nước uống / Đồ ăn nhanh"></div>
+   <div><label>Đơn vị tính</label><input name="donViTinh" value="cái"></div><div><label>Giá bán</label><input type="number" name="giaBan" min="0" required></div>
+   <div><label>Tồn ban đầu</label><input type="number" name="soLuongTon" min="0" value="0"></div><div><label>Mức tồn tối thiểu</label><input type="number" name="mucTonToiThieu" min="0" value="5"></div>
+   <div class="full"><label>Ghi chú</label><input name="ghiChu"></div><div><button class="btn primary">Lưu</button></div></form></details></div>
+<div class="panel"><table>
+ <tr><th>Mã</th><th>Sản phẩm</th><th>Loại</th><th class="r">Giá bán</th><th class="r">Tồn</th><th class="r">Tối thiểu</th><th>Trạng thái</th><th>Thao tác</th></tr>
+ <tr th:each="s : ${dsSp}"><td th:text="'SP' + ${s.maSanPham}"></td><td><b th:text="${s.tenSanPham}"></b> <span class="muted" th:text="'(' + ${s.donViTinh} + ')'"></span></td>
+  <td th:text="${s.loaiSanPham}"></td><td class="r" th:text="${#numbers.formatInteger(s.giaBan,1,'POINT')}"></td>
+  <td class="r"><b th:text="${s.soLuongTon}"></b> <span class="badge quagio" th:if="${s.sapHet}">Sắp hết hàng</span></td><td class="r" th:text="${s.mucTonToiThieu}"></td>
+  <td><span class="badge" th:classappend="${s.trangThaiKinhDoanh=='dang_ban'} ? 'xanh' : 'do'" th:text="${s.trangThaiKinhDoanh=='dang_ban'} ? 'Đang bán' : (${s.trangThaiKinhDoanh=='het_hang'} ? 'Hết hàng' : 'Ngừng bán')"></span></td>
+  <td style="white-space:nowrap">
+   <details style="display:inline-block"><summary class="btn sm">Sửa</summary>
+    <form method="post" th:action="@{/dich-vu/san-pham/luu}" class="form-grid panel" style="padding:12px;min-width:360px;position:absolute;z-index:5">
+     <input type="hidden" name="maSanPham" th:value="${s.maSanPham}">
+     <div><input name="tenSanPham" th:value="${s.tenSanPham}" required></div><div><input name="loaiSanPham" th:value="${s.loaiSanPham}"></div>
+     <div><input name="donViTinh" th:value="${s.donViTinh}"></div><div><input type="number" name="giaBan" th:value="${s.giaBan}" required></div>
+     <div><label>Tồn tối thiểu</label><input type="number" name="mucTonToiThieu" th:value="${s.mucTonToiThieu}"></div><div><label>Ghi chú</label><input name="ghiChu" th:value="${s.ghiChu}"></div>
+     <div><button class="btn sm primary">Lưu</button></div></form></details>
+   <details style="display:inline-block"><summary class="btn sm">Ghi hỏng</summary>
+    <form method="post" th:action="@{/dich-vu/san-pham/{id}/hong(id=${s.maSanPham})}" class="form-grid panel" style="padding:12px;min-width:260px;position:absolute;z-index:5">
+     <div><input type="number" name="soLuong" min="1" placeholder="Số lượng" required></div><div><input name="lyDo" placeholder="Lý do"></div><div><button class="btn sm danger">Ghi nhận</button></div></form></details>
+   <form style="display:inline" method="post" th:action="@{/dich-vu/san-pham/{id}/ngung(id=${s.maSanPham})}">
+     <input type="hidden" name="ngung" th:value="${s.trangThaiKinhDoanh != 'ngung_ban'}">
+     <button class="btn sm" th:text="${s.trangThaiKinhDoanh == 'ngung_ban'} ? 'Bán lại' : 'Ngừng bán'"></button></form></td></tr>
+</table></div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

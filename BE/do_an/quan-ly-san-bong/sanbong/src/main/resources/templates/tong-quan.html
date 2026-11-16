@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Tổng quan')}"></head>
+<body>
+<div class="app">
+<aside th:replace="~{fragments/layout :: sidebar('tongquan')}"></aside>
+<div class="main-col">
+<header th:replace="~{fragments/layout :: topbar('Tổng quan')}"></header>
+<main class="content">
+<div th:replace="~{fragments/layout :: thongbao}"></div>
+
+<div class="page-head"><div><h1>Tổng quan hoạt động hôm nay</h1>
+<p class="sub">Tình hình sân bóng trong ngày <b class="mono" th:text="${hnay}"></b></p></div></div>
+<div class="cards">
+  <div class="card"><div class="card-t"><span>Tổng số sân</span></div><div class="big"><span th:text="${tongSan}">12</span> <small>sân</small></div></div>
+  <div class="card"><div class="card-t"><span>Sân đang trống</span></div><div class="big" style="color:#6a6a60"><span th:text="${sanTrong}">0</span></div></div>
+  <div class="card"><div class="card-t"><span>Sân sắp đến giờ đá</span></div><div class="big" style="color:#b58a00"><span th:text="${sapDen}">0</span></div><div class="muted">Còn ≤ 10 phút</div></div>
+  <div class="card"><div class="card-t"><span>Sân đang đá</span></div><div class="big" style="color:#3d8015"><span th:text="${dangDa}">0</span></div></div>
+  <div class="card"><div class="card-t"><span>Đơn đã hủy</span></div><div class="big" style="color:#c62828"><span th:text="${daHuy}">0</span></div></div>
+  <div class="card"><div class="card-t"><span>Số lượng đơn hôm nay</span></div><div class="big"><span th:text="${soDon}">0</span></div></div>
+  <div class="card"><div class="card-t"><span>Doanh thu sân hôm nay</span></div>
+    <div class="big" style="font-size:24px"><span th:text="${#numbers.formatInteger(doanhThu.doanhThuSan,1,'POINT')}">0</span>đ</div>
+    <div class="muted">Dịch vụ: <span th:text="${#numbers.formatInteger(doanhThu.dichVu,1,'POINT')}">0</span>đ</div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-h"><h3>Doanh thu 7 ngày gần nhất</h3></div><div class="panel-b"><canvas id="cDt" height="150"></canvas></div></div>
+  <div class="panel"><div class="panel-h"><h3>Số lượt đặt sân 7 ngày gần nhất</h3></div><div class="panel-b"><canvas id="cLuot" height="150"></canvas></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-h"><h3>Top sân được sử dụng nhiều nhất (tháng này)</h3></div>
+    <table><tr><th>Sân</th><th class="r">Lượt</th><th class="r">Giờ đá</th><th class="r">Tỷ lệ SD</th></tr>
+      <tr th:each="s : ${topSan}"><td th:text="${s.san.ten}"></td><td class="r" th:text="${s.luotDat}"></td><td class="r" th:text="${s.soGio}"></td><td class="r" th:text="${s.tyLe} + '%'"></td></tr></table></div>
+  <div class="panel"><div class="panel-h"><h3>Top dịch vụ bán chạy (tháng này)</h3></div>
+    <table><tr><th>Sản phẩm</th><th class="r">Đã bán</th><th class="r">Doanh thu</th></tr>
+      <tr th:each="s : ${topDv}"><td th:text="${s.ten}"></td><td class="r" th:text="${s.soLuong}"></td><td class="r" th:text="${#numbers.formatInteger(s.doanhThu,1,'POINT')} + 'đ'"></td></tr>
+      <tr th:if="${#lists.isEmpty(topDv)}"><td colspan="3" class="muted">Chưa có dữ liệu bán hàng.</td></tr></table></div>
+</div>
+
+</main>
+</div>
+</div>
+<div th:replace="~{fragments/booking :: modalDatSan}"></div>
+<div th:replace="~{fragments/booking :: modalChiTiet}"></div>
+<script th:src="@{/js/app.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+const nhan=/*[[${nhan}]]*/[], vDt=/*[[${vDt}]]*/[], vLuot=/*[[${vLuot}]]*/[];
+if(window.Chart){
+new Chart(document.getElementById('cDt'),{type:'bar',data:{labels:nhan,datasets:[{label:'Doanh thu (đ)',data:vDt,backgroundColor:'#4c9b1d'}]},options:{plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('cLuot'),{type:'line',data:{labels:nhan,datasets:[{label:'Lượt đặt',data:vLuot,borderColor:'#1d1d1b',tension:.3}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+}
+</script>
+</body>
+</html>
