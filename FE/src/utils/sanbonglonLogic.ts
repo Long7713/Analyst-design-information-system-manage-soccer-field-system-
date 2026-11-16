@@ -253,11 +253,16 @@ export function applyBookingAction(
       return { ...booking, status: 'checked-in' };
 
     case 'them-gio': {
+<<<<<<< HEAD
       const addHours = payload?.extraHours ?? EXTRA_SLOT_HOURS;
       // Thêm giờ tối thiểu 0,5h và phải là bội số của 0,5h; ngoài ra giữ nguyên phiếu.
       if (addHours < EXTRA_SLOT_HOURS || (addHours / EXTRA_SLOT_HOURS) % 1 !== 0) {
         return booking;
       }
+=======
+      const addHours = payload?.extraHours ?? 0.5;//Chỗ này phải kiểm tra kỹ là  số giờ thuê thêm phải từ 30p đổ lên
+      const rate = payload?.extraRatePerHour ?? 300000; 
+>>>>>>> 3626bef (Vuong chinh lai may cai thuat toan voi ham di, sai r)
       const nextDuration = Math.min(OPERATING_END_HOUR - booking.startHour, booking.durationHours + addHours);
       const actualAdded = Math.max(0, nextDuration - booking.durationHours);
       return {

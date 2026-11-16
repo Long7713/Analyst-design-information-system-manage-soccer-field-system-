@@ -66,7 +66,11 @@ interface ToastItem {
   message: string;
 }
 
+<<<<<<< HEAD
 // ID duy nhất nhờ bộ đếm tăng dần (4 chữ số để không trùng ID mẫu như MOV-901).
+=======
+// ID duy nhất kể cả khi nhiều bản ghi được tạo cùng.
+>>>>>>> 3626bef (Vuong chinh lai may cai thuat toan voi ham di, sai r)
 let idSeq = 0;
 const genId = (prefix: string) => `${prefix}-${String(++idSeq).padStart(4, '0')}`;
 
@@ -98,7 +102,7 @@ export default function App() {
   const [nbNotes, setNbNotes] = useState<string>('');
   const [nbError, setNbError] = useState<string>('');
 
-  // Chỉ các phiếu của ngày đang chọn được đưa vào lịch, thống kê, Dashboard, trang công khai.
+  // Chỉ các phiếu của ngày đang chọn được đưa vào lịch, thống kê, trang chính, trang công khai.
   const bookingsForDate = useMemo(
     () => bookings.filter((b) => b.date === selectedDate),
     [bookings, selectedDate]
@@ -149,6 +153,7 @@ export default function App() {
   ) => {
     const entry: AuditLogEntry = {
       id: genId('AUD'),
+      // Tránh lỗi phía sever và client chạy ở 2 thời điểm khác sẽ tạo ra 2 kết quả id khác nhau(Tránh trùng id), tăng khả năng fix bug và upgrade
       traceId: `TRC-${Math.floor(1000 + Math.random() * 9000)}X`,
       timestamp: '17/10/2026 – Vừa xong',
       actor: sidebarConfig.operator.name,
